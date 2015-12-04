@@ -34,7 +34,7 @@
     <packaging>bundle</packaging>
 
     <name>net.yetamine.sova</name>
-    <description>Symbol-oriented value adaptation to support heterogenous collections.</description>
+    <description>Symbol-oriented value adaptation to support typesafe heterogenous containers.</description>
     <url>https://github.com/pdolezal/net.yetamine.sova</url>
     <inceptionYear>2015</inceptionYear>
 
