@@ -16,8 +16,10 @@
 
 package net.yetamine.sova.core;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -33,13 +35,32 @@ import java.util.function.Function;
  * @param <T>
  *            the type of resulting values
  */
-public abstract class AbstractSymbol<T> implements Symbol<T> {
+public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
 
     /**
      * Prepares a new instance.
      */
     protected AbstractSymbol() {
         // Default constructor
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringJoiner result = new StringJoiner(", ", "symbol[", "]").setEmptyValue(super.toString());
+        introspect().forEach((name, value) -> result.add(new StringBuilder(name).append('=').append(value)));
+        return result.toString();
+    }
+
+    /**
+     * @see net.yetamine.sova.core.Introspection#introspect()
+     */
+    public final Map<String, ?> introspect() {
+        final Map<String, Object> result = new LinkedHashMap<>();
+        introspect(result);
+        return result;
     }
 
     /**
@@ -137,5 +158,21 @@ public abstract class AbstractSymbol<T> implements Symbol<T> {
      */
     public final Object set(Map<? super Symbol<T>, ? super T> consumer, Object value) {
         return Symbol.super.set(consumer, value);
+    }
+
+    /**
+     * Adds implementation-specific features to the set of results provided by
+     * the {@link #introspect()} method.
+     *
+     * <p>
+     * Implementations are supposed to invoke the inherited implementations and
+     * just add their own data. But since the whole set is available, inherited
+     * classes may even remove elements that are not
+     *
+     * @param result
+     *            the resulting set. It must not be {@code null}.
+     */
+    protected void introspect(Map<String, Object> result) {
+        // Do nothing
     }
 }

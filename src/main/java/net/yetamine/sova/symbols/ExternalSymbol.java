@@ -16,6 +16,7 @@
 
 package net.yetamine.sova.symbols;
 
+import java.util.Map;
 import java.util.Objects;
 
 import net.yetamine.sova.core.AdaptationStrategy;
@@ -83,20 +84,6 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
     }
 
     /**
-     * The default implementation returns the information consisting of the
-     * {@link #identifier()} as a {@link String} in the way which is consistent
-     * with the representation of other symbol implementations in this package.
-     * This method can be overridden by inherited classes arbitrarily, but it
-     * should be always considered as an informative source.
-     *
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return String.format("symbol[id=%s]", identifier);
-    }
-
-    /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -117,5 +104,14 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
      */
     public final I identifier() {
         return identifier;
+    }
+
+    /**
+     * @see net.yetamine.sova.core.AbstractSymbol#introspect(java.util.Map)
+     */
+    @Override
+    protected void introspect(Map<String, Object> result) {
+        super.introspect(result);
+        result.put("uid", identifier);
     }
 }

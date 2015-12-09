@@ -16,6 +16,8 @@
 
 package net.yetamine.sova.symbols;
 
+import java.util.Map;
+
 import net.yetamine.sova.core.AdaptationStrategy;
 import net.yetamine.sova.core.DelegatingSymbol;
 import net.yetamine.sova.core.Downcasting;
@@ -62,19 +64,6 @@ public class InternalSymbol<T> extends DelegatingSymbol<T> {
     }
 
     /**
-     * The default implementation returns the information consisting of the
-     * instance identity hash code and the actual class in the way which is
-     * consistent with the representation of other symbol implementations in
-     * this package.
-     *
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return String.format("symbol[id=%8x, class=%s]", System.identityHashCode(this), getClass().getTypeName());
-    }
-
-    /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -88,5 +77,15 @@ public class InternalSymbol<T> extends DelegatingSymbol<T> {
     @Override
     public final int hashCode() {
         return super.hashCode();
+    }
+
+    /**
+     * @see net.yetamine.sova.core.AbstractSymbol#introspect(java.util.Map)
+     */
+    @Override
+    protected void introspect(Map<String, Object> result) {
+        super.introspect(result);
+        result.put("id", String.format("hash:%08x", System.identityHashCode(this)));
+        result.put("class", getClass().getTypeName());
     }
 }

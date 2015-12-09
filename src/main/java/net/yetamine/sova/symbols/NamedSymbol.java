@@ -16,6 +16,8 @@
 
 package net.yetamine.sova.symbols;
 
+import java.util.Map;
+
 import net.yetamine.sova.core.AdaptationStrategy;
 import net.yetamine.sova.core.DelegatingSymbol;
 import net.yetamine.sova.core.Downcasting;
@@ -60,23 +62,19 @@ public final class NamedSymbol<T> extends DelegatingSymbol<T> implements TaggedS
     }
 
     /**
-     * The default implementation returns the information consisting of the
-     * {@link #tag()} as a {@link String} and the instance identity hash code;
-     * the presence of the hash code should be helpful for debugging to ensure
-     * visible difference between two distinct instances, even when they have
-     * the same tag.
-     *
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return String.format("symbol[id=%8x, tag=%s]", System.identityHashCode(this), tag);
-    }
-
-    /**
      * @see net.yetamine.sova.symbols.TaggedSymbol#tag()
      */
     public String tag() {
         return tag;
+    }
+
+    /**
+     * @see net.yetamine.sova.core.AbstractSymbol#introspect(java.util.Map)
+     */
+    @Override
+    protected void introspect(Map<String, Object> result) {
+        super.introspect(result);
+        result.put("id", String.format("hash:%08x", System.identityHashCode(this)));
+        result.put("tag", tag);
     }
 }
