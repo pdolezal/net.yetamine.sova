@@ -17,11 +17,12 @@
 package net.yetamine.sova.symbols;
 
 import net.yetamine.sova.core.AdaptationStrategy;
+import net.yetamine.sova.core.DelegatingSymbol;
 import net.yetamine.sova.core.Downcasting;
 
 /**
- * A symbol implementation that intentionally forces instance identity,
- * therefore each instance of this class is equal only to itself.
+ * A symbol implementation that intentionally uses instance identity, therefore
+ * each instance of this class is equal only to itself.
  *
  * <p>
  * The instance identity enforcement is useful when really a single instance of

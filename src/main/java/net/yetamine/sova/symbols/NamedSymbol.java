@@ -17,17 +17,21 @@
 package net.yetamine.sova.symbols;
 
 import net.yetamine.sova.core.AdaptationStrategy;
+import net.yetamine.sova.core.DelegatingSymbol;
 import net.yetamine.sova.core.Downcasting;
 
 /**
- * A convenient extension of {@link TaggedSymbol} that declares a {@link String}
- * tag. The tag is intended to provide a human-friendly name of the particular
- * symbol instance for debugging purposes.
+ * An implementation of {@link TaggedSymbol} that declares a {@link String} tag.
+ * The tag is intended to provide a human-friendly name of the particular symbol
+ * instance for debugging purposes.
  *
  * @param <T>
  *            the type of resulting values
  */
-public final class NamedSymbol<T> extends TaggedSymbol<String, T> {
+public final class NamedSymbol<T> extends DelegatingSymbol<T> implements TaggedSymbol<String, T> {
+
+    /** Tag of this instance. */
+    private final String tag;
 
     /**
      * Create a new instance.
@@ -38,7 +42,8 @@ public final class NamedSymbol<T> extends TaggedSymbol<String, T> {
      *            the adaptation implementation. It must not be {@code null}.
      */
     public NamedSymbol(String instanceTag, AdaptationStrategy<T> adaptation) {
-        super(instanceTag, adaptation);
+        super(adaptation);
+        tag = instanceTag;
     }
 
     /**
@@ -52,5 +57,26 @@ public final class NamedSymbol<T> extends TaggedSymbol<String, T> {
      */
     public NamedSymbol(String instanceTag, Class<T> type) {
         this(instanceTag, Downcasting.to(type));
+    }
+
+    /**
+     * The default implementation returns the information consisting of the
+     * {@link #tag()} as a {@link String} and the instance identity hash code;
+     * the presence of the hash code should be helpful for debugging to ensure
+     * visible difference between two distinct instances, even when they have
+     * the same tag.
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String.format("symbol[id=%8x, tag=%s]", System.identityHashCode(this), tag);
+    }
+
+    /**
+     * @see net.yetamine.sova.symbols.TaggedSymbol#tag()
+     */
+    public String tag() {
+        return tag;
     }
 }

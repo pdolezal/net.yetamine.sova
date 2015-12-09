@@ -37,32 +37,46 @@ import java.util.function.Function;
  * be used as keys in map-like containers, all implementations must be (at
  * least) effectively immutable.
  *
- * <p>
- * This class does not define any specific behavior of {@link #equals(Object)},
- * besides the general rules that imply that two equal instances must provide
- * the same results when all relevant preconditions are satisfied; especially,
- * an implementation must not extend preconditions of inherited contracts (it
- * may weaken them only). Inherited classes are required to define details to
- * make instance equivalence defined properly.
- *
  * @param <T>
  *            the type of resulting values
  */
-public abstract class Symbol<T> implements AdaptationStrategy<T> {
+public interface Symbol<T> extends AdaptationStrategy<T> {
 
     /**
-     * Prepares a new instance.
+     * Compares the specified symbols for equality.
+     *
+     * <p>
+     * Implementations are required to define this method in order to provide
+     * correct and consistent behavior. In general, two symbols should be equal
+     * only if they have the same semantics and provide the same results.
+     *
+     * <p>
+     * The conditions may be bound to a well-known published identifier linked
+     * to a symbol instance for a particular symbol type, but using the default
+     * implementation that compares just the identity of instances could be yet
+     * another well-working option.
+     *
+     * @param o
+     *            object to be compared for equality with this instance
+     *
+     * @return {@code true} if the object is equal to this instance
+     *
+     * @see Object#equals(Object)
      */
-    protected Symbol() {
-        // Default constructor
-    }
+    boolean equals(Object o);
 
     /**
-     * @see net.yetamine.sova.core.AdaptationStrategy#fallback()
+     * Returns the hash code value for this symbol.
+     *
+     * <p>
+     * Implementations must override this method in order to make it consistent
+     * with {@link #equals(Object)} if they override {@code equals()} as well.
+     *
+     * @return the hash code value for this symbol
+     *
+     * @see Object#equals(Object)
      */
-    public final T fallback() {
-        return AdaptationStrategy.super.fallback();
-    }
+    int hashCode();
 
     // Generic access methods
 
@@ -76,7 +90,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      *
      * @return the result of the adaptation, or {@code null} if not possible
      */
-    public final T get(Function<? super Symbol<?>, ?> source) {
+    default T get(Function<? super Symbol<?>, ?> source) {
         return adaptation().apply(source.apply(this));
     }
 
@@ -92,7 +106,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      * @return the result of the adaptation, or the fallback if the adaptation
      *         input is missing
      */
-    public final T gain(Function<? super Symbol<?>, ?> source) {
+    default T gain(Function<? super Symbol<?>, ?> source) {
         final Object object = source.apply(this);
         return (object != null) ? adaptation().apply(object) : fallback();
     }
@@ -109,7 +123,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      * @return the result of the adaptation or the fallback (which still may
      *         return {@code null})
      */
-    public final T seek(Function<? super Symbol<?>, ?> source) {
+    default T seek(Function<? super Symbol<?>, ?> source) {
         return find(source).orElseGet(fallbackSupplier());
     }
 
@@ -123,7 +137,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      *
      * @return the {@link Optional} with the result of the adaptation
      */
-    public final Optional<T> find(Function<? super Symbol<?>, ?> source) {
+    default Optional<T> find(Function<? super Symbol<?>, ?> source) {
         return adaptation().attempt(source.apply(this));
     }
 
@@ -136,7 +150,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      * @param value
      *            the value to pass
      */
-    public final void put(BiConsumer<? super Symbol<T>, ? super T> consumer, T value) {
+    default void put(BiConsumer<? super Symbol<T>, ? super T> consumer, T value) {
         consumer.accept(this, value);
     }
 
@@ -150,7 +164,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      * @param value
      *            the value to adapt and pass
      */
-    public final void set(BiConsumer<? super Symbol<T>, ? super T> consumer, Object value) {
+    default void set(BiConsumer<? super Symbol<T>, ? super T> consumer, Object value) {
         put(consumer, adaptation().apply(value));
     }
 
@@ -166,7 +180,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      *
      * @return the result of the adaptation, or {@code null} if not possible
      */
-    public final T get(Map<?, ?> source) {
+    default T get(Map<?, ?> source) {
         return adaptation().apply(source.get(this));
     }
 
@@ -182,7 +196,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      * @return the result of the adaptation, or the fallback if the adaptation
      *         input is missing
      */
-    public final T gain(Map<?, ?> source) {
+    default T gain(Map<?, ?> source) {
         final Object object = source.get(this);
         return (object != null) ? adaptation().apply(object) : fallback();
     }
@@ -199,7 +213,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      * @return the result of the adaptation or the fallback (which still may
      *         return {@code null})
      */
-    public final T seek(Map<?, ?> source) {
+    default T seek(Map<?, ?> source) {
         return find(source).orElseGet(fallbackSupplier());
     }
 
@@ -213,7 +227,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      *
      * @return the {@link Optional} with the result of the adaptation
      */
-    public final Optional<T> find(Map<?, ?> source) {
+    default Optional<T> find(Map<?, ?> source) {
         return adaptation().attempt(source.get(this));
     }
 
@@ -228,7 +242,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      *
      * @return the result of the {@link Map#put(Object, Object)} invocation
      */
-    public final Object put(Map<? super Symbol<T>, ? super T> consumer, T value) {
+    default Object put(Map<? super Symbol<T>, ? super T> consumer, T value) {
         return consumer.put(this, value);
     }
 
@@ -244,7 +258,7 @@ public abstract class Symbol<T> implements AdaptationStrategy<T> {
      *
      * @return the result of the {@link Map#put(Object, Object)} invocation
      */
-    public final Object set(Map<? super Symbol<T>, ? super T> consumer, Object value) {
+    default Object set(Map<? super Symbol<T>, ? super T> consumer, Object value) {
         return put(consumer, adaptation().apply(value));
     }
 }

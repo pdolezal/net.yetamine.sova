@@ -19,7 +19,9 @@ package net.yetamine.sova.symbols;
 import java.util.Objects;
 
 import net.yetamine.sova.core.AdaptationStrategy;
+import net.yetamine.sova.core.DelegatingSymbol;
 import net.yetamine.sova.core.Downcasting;
+import net.yetamine.sova.core.PublicSymbol;
 
 /**
  * A symbol implementation which is coupled with a published identifier that is
@@ -48,7 +50,7 @@ import net.yetamine.sova.core.Downcasting;
  * @param <V>
  *            the type of resulting values
  */
-public class ExternalSymbol<I, V> extends DelegatingSymbol<V> {
+public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicSymbol<I, V> {
 
     /** Identifier of this instance. */
     private final I identifier;
@@ -99,7 +101,7 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> {
      */
     @Override
     public final boolean equals(Object obj) {
-        return (obj instanceof ExternalSymbol<?, ?>) && identifier.equals(((ExternalSymbol<?, ?>) obj).identifier);
+        return PublicSymbol.equals(this, obj);
     }
 
     /**
@@ -107,7 +109,7 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> {
      */
     @Override
     public final int hashCode() {
-        return identifier.hashCode();
+        return PublicSymbol.hashCode(this);
     }
 
     /**

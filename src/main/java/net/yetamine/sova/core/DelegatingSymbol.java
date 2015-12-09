@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.symbols;
+package net.yetamine.sova.core;
 
 import java.util.function.Supplier;
 
-import net.yetamine.sova.core.Adaptation;
-import net.yetamine.sova.core.AdaptationStrategy;
-import net.yetamine.sova.core.Symbol;
-
 /**
- * An abstract symbol base that uses another {@link AdaptationStrategy}.
+ * An abstract base class that uses another {@link AdaptationStrategy}.
  *
  * <p>
  * This class delegates to the operations given by an {@link AdaptationStrategy}
@@ -33,7 +29,7 @@ import net.yetamine.sova.core.Symbol;
  * @param <T>
  *            the type of resulting values
  */
-public abstract class DelegatingSymbol<T> extends Symbol<T> {
+public abstract class DelegatingSymbol<T> extends AbstractSymbol<T> {
 
     /** Actual adaptation implementation. */
     private final Adaptation<T> adaptation;
