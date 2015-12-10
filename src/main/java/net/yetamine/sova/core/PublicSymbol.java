@@ -16,8 +16,6 @@
 
 package net.yetamine.sova.core;
 
-import java.util.function.Function;
-
 /**
  * An extension of the {@link Symbol} interface that links every instance to a
  * public identifier.
@@ -130,27 +128,11 @@ public interface PublicSymbol<I, V> extends Symbol<V> {
     I identifier();
 
     /**
-     * Returns the natural mapping function which is {@link #identifier()}.
+     * Returns the mapping implementation using the identifier instead of self.
      *
-     * @return the natural mapping function that maps to {@link #identifier()}
+     * @return the mapping implementation using the identifier instead of self
      */
-    static <I> Function<PublicSymbol<I, ?>, I> mapping() {
-        return PublicSymbol::identifier;
-    }
-
-    /**
-     * Returns a mapping function that invokes the given function with the
-     * identifier of the argument of the mapping function
-     * 
-     * identifier of the symbol passed as its argument; if the argument is not a
-     * {@link PublicSymbol}, then {@code null} is returned instead.
-     *
-     * @param source
-     *            the source map. It must not be {@code null}.
-     *
-     * @return the mapping function
-     */
-    static <I, V> Function<PublicSymbol<I, ?>, V> mapping(Function<? super I, V> source) {
-        return source.compose(mapping());
+    default Mappable<I, V> mappable() {
+        return new DefaultMappable<>(this, this::identifier);
     }
 }

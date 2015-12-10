@@ -70,33 +70,42 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
         return Symbol.super.fallback();
     }
 
+    // Mapping support
+
+    /**
+     * @see net.yetamine.sova.core.Symbol#mapping()
+     */
+    public Symbol<T> mapping() {
+        return Symbol.super.mapping();
+    }
+
     // Generic access methods
 
     /**
      * @see net.yetamine.sova.core.Symbol#get(java.util.function.Function)
      */
-    public final T get(Function<? super Symbol<?>, ?> source) {
+    public final T get(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.get(source);
     }
 
     /**
      * @see net.yetamine.sova.core.Symbol#gain(java.util.function.Function)
      */
-    public final T gain(Function<? super Symbol<?>, ?> source) {
+    public final T gain(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.gain(source);
     }
 
     /**
      * @see net.yetamine.sova.core.Symbol#seek(java.util.function.Function)
      */
-    public final T seek(Function<? super Symbol<?>, ?> source) {
+    public final T seek(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.seek(source);
     }
 
     /**
      * @see net.yetamine.sova.core.Symbol#find(java.util.function.Function)
      */
-    public final Optional<T> find(Function<? super Symbol<?>, ?> source) {
+    public final Optional<T> find(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.find(source);
     }
 

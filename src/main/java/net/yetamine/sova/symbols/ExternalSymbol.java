@@ -22,6 +22,7 @@ import java.util.Objects;
 import net.yetamine.sova.core.AdaptationStrategy;
 import net.yetamine.sova.core.DelegatingSymbol;
 import net.yetamine.sova.core.Downcasting;
+import net.yetamine.sova.core.Mappable;
 import net.yetamine.sova.core.PublicSymbol;
 
 /**
@@ -55,6 +56,8 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
 
     /** Identifier of this instance. */
     private final I identifier;
+    /** Cached {@link #mappable()}. */
+    private Mappable<I, V> mapping;
 
     /**
      * Creates a new instance.
@@ -104,6 +107,23 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
      */
     public final I identifier() {
         return identifier;
+    }
+
+    /**
+     * @see net.yetamine.sova.core.PublicSymbol#mappable()
+     */
+    public final Mappable<I, V> mappable() {
+        // Using caching technique that uses out-of-thin air thread safety;
+        // this technique is alright here, because the instances are always
+        // behaving in the same way, therefore they are interchangeable
+        Mappable<I, V> result = mapping;
+        if (result != null) {
+            return result;
+        }
+
+        result = PublicSymbol.super.mappable();
+        mapping = result;
+        return result;
     }
 
     /**
