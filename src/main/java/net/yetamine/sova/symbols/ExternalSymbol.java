@@ -100,7 +100,7 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
     }
 
     /**
-     * @return the identifier of this instance
+     * @see net.yetamine.sova.core.PublicSymbol#identifier()
      */
     public final I identifier() {
         return identifier;

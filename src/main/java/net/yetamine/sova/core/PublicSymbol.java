@@ -16,6 +16,8 @@
 
 package net.yetamine.sova.core;
 
+import java.util.function.Function;
+
 /**
  * An extension of the {@link Symbol} interface that links every instance to a
  * public identifier.
@@ -39,6 +41,8 @@ package net.yetamine.sova.core;
  *            the type of resulting values
  */
 public interface PublicSymbol<I, V> extends Symbol<V> {
+
+    // Equality definition
 
     /**
      * Compares the specified symbols for equality.
@@ -75,13 +79,6 @@ public interface PublicSymbol<I, V> extends Symbol<V> {
     int hashCode();
 
     /**
-     * Returns the identifier of this instance.
-     *
-     * @return the identifier of this instance, never {@code null}
-     */
-    I identifier();
-
-    /**
      * Compares an instance to an object on equality.
      *
      * <p>
@@ -100,6 +97,10 @@ public interface PublicSymbol<I, V> extends Symbol<V> {
      *         has an equal identifier
      */
     static boolean equals(PublicSymbol<?, ?> that, Object obj) {
+        if (that == obj) { // This could be a very common case, especially due to mapping()
+            return true;
+        }
+
         return (obj instanceof PublicSymbol<?, ?>) && that.identifier().equals(((PublicSymbol<?, ?>) obj).identifier());
     }
 
@@ -117,5 +118,39 @@ public interface PublicSymbol<I, V> extends Symbol<V> {
      */
     static int hashCode(PublicSymbol<?, ?> that) {
         return that.identifier().hashCode();
+    }
+
+    // Identifier support
+
+    /**
+     * Returns the identifier of this instance.
+     *
+     * @return the identifier of this instance, never {@code null}
+     */
+    I identifier();
+
+    /**
+     * Returns the natural mapping function which is {@link #identifier()}.
+     *
+     * @return the natural mapping function that maps to {@link #identifier()}
+     */
+    static <I> Function<PublicSymbol<I, ?>, I> mapping() {
+        return PublicSymbol::identifier;
+    }
+
+    /**
+     * Returns a mapping function that invokes the given function with the
+     * identifier of the argument of the mapping function
+     * 
+     * identifier of the symbol passed as its argument; if the argument is not a
+     * {@link PublicSymbol}, then {@code null} is returned instead.
+     *
+     * @param source
+     *            the source map. It must not be {@code null}.
+     *
+     * @return the mapping function
+     */
+    static <I, V> Function<PublicSymbol<I, ?>, V> mapping(Function<? super I, V> source) {
+        return source.compose(mapping());
     }
 }
