@@ -69,6 +69,39 @@ public final class NamedSymbol<T> extends DelegatingSymbol<T> implements TaggedS
     }
 
     /**
+     * Makes a qualified name according to a common pattern.
+     *
+     * @param qualifier
+     *            the qualifying space for the local part of the name. It must
+     *            not be {@code null} and it should consist only of characters
+     *            that may occur in internet domain names.
+     * @param identifier
+     *            the local part of the name. It must not be {@code null}.
+     *
+     * @return a qualified name consisting of both parts
+     */
+    public static String name(String qualifier, String identifier) {
+        final StringBuilder result = new StringBuilder(qualifier.length() + identifier.length() + 2);
+        result.append('{').append(qualifier).append('}').append(identifier);
+        return result.toString();
+    }
+
+    /**
+     * Makes a qualified name according to a common pattern.
+     *
+     * @param qualifier
+     *            the qualifying space for the local part of the name. It must
+     *            not be {@code null}.
+     * @param identifier
+     *            the local part of the name. It must not be {@code null}.
+     *
+     * @return a qualified name consisting of both parts
+     */
+    public static String name(Class<?> qualifier, String identifier) {
+        return name(qualifier.getTypeName(), identifier);
+    }
+
+    /**
      * @see net.yetamine.sova.core.AbstractSymbol#introspect(java.util.Map)
      */
     @Override
