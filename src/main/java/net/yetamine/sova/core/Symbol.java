@@ -168,6 +168,126 @@ public interface Symbol<T> extends AdaptationStrategy<T> {
         put(consumer, adaptation().apply(value));
     }
 
+    // Generic mapped access methods
+
+    /**
+     * Adapts the object provided by a {@link Function} using this instance as
+     * the input for the given mapping function.
+     *
+     * @param <U>
+     *            the type of the mapping result
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     * @param mapping
+     *            the mapping function making the input for the source. It must
+     *            not be {@code null}.
+     *
+     * @return the result of the adaptation, or {@code null} if not possible
+     */
+    default <U> T get(Function<? super U, ?> source, Function<? super Symbol<?>, U> mapping) {
+        return adaptation().apply(source.apply(mapping.apply(this)));
+    }
+
+    /**
+     * Adapts the value provided by a {@link Function} using this instance as
+     * its input; if the returned value is {@code null}, {@link #fallback()}
+     * result is returned instead.
+     *
+     * @param <U>
+     *            the type of the mapping result
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     * @param mapping
+     *            the mapping function making the input for the source. It must
+     *            not be {@code null}.
+     *
+     * @return the result of the adaptation, or the fallback if the adaptation
+     *         input is missing
+     */
+    default <U> T gain(Function<? super U, ?> source, Function<? super Symbol<?>, U> mapping) {
+        final Object object = source.apply(mapping.apply(this));
+        return (object != null) ? adaptation().apply(object) : fallback();
+    }
+
+    /**
+     * Adapts the object provided by a {@link Function} using this instance as
+     * its input, or returns the {@link #fallback()} if the adaptation returns
+     * {@code null} for whatever reason.
+     *
+     * @param <U>
+     *            the type of the mapping result
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     * @param mapping
+     *            the mapping function making the input for the source. It must
+     *            not be {@code null}.
+     *
+     * @return the result of the adaptation or the fallback (which still may
+     *         return {@code null})
+     */
+    default <U> T seek(Function<? super U, ?> source, Function<? super Symbol<?>, U> mapping) {
+        return find(source, mapping).orElseGet(fallbackSupplier());
+    }
+
+    /**
+     * Adapts the object provided by a {@link Function} using this instance as
+     * its input.
+     *
+     * @param <U>
+     *            the type of the mapping result
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     * @param mapping
+     *            the mapping function making the input for the source. It must
+     *            not be {@code null}.
+     *
+     * @return the {@link Optional} with the result of the adaptation
+     */
+    default <U> Optional<T> find(Function<? super U, ?> source, Function<? super Symbol<?>, U> mapping) {
+        return adaptation().attempt(source.apply(mapping.apply(this)));
+    }
+
+    /**
+     * Passes this instance and the given value to the given consumer.
+     *
+     * @param <U>
+     *            the type of the mapping result
+     * @param consumer
+     *            the consumer to accept this instance and the given value. It
+     *            must not be {@code null}.
+     * @param value
+     *            the value to pass
+     * @param mapping
+     *            the mapping function making the input for the source. It must
+     *            not be {@code null}.
+     */
+    default <U> void put(BiConsumer<? super U, ? super T> consumer, T value, Function<? super Symbol<?>, U> mapping) {
+        consumer.accept(mapping.apply(this), value);
+    }
+
+    /**
+     * Passes this instance and the adaptation of the given value to the given
+     * consumer.
+     *
+     * @param <U>
+     *            the type of the mapping result
+     * @param consumer
+     *            the consumer to accept this instance and the given value. It
+     *            must not be {@code null}.
+     * @param value
+     *            the value to adapt and pass
+     * @param mapping
+     *            the mapping function making the input for the source. It must
+     *            not be {@code null}.
+     */
+    default <U> void set(BiConsumer<? super U, ? super T> consumer, Object value, Function<? super Symbol<?>, U> mapping) {
+        put(consumer, adaptation().apply(value), mapping);
+    }
+
     // Map-based access methods
 
     /**
