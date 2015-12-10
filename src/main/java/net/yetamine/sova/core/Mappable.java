@@ -32,7 +32,7 @@ import java.util.function.Function;
 public interface Mappable<K, V> extends AdaptationStrategy<V> {
 
     /**
-     * Returns the mappable key for this instance.
+     * Returns the mapping key for this instance.
      *
      * <p>
      * This method must return always equal values (and it is preferred to use
@@ -40,7 +40,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * must have properly implemented and well-defined equality to be usable as
      * keys.
      *
-     * @return the mappable key for this instance, which should never be
+     * @return the mapping key for this instance, which should never be
      *         {@code null}
      */
     K mapping();

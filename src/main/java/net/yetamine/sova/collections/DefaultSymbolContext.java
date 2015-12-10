@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import net.yetamine.sova.core.Symbol;
-
 /**
  * A default implementation of the {@link SymbolContext} interface that just
  * adapts an existing {@link Map} instance.
@@ -33,7 +31,7 @@ public final class DefaultSymbolContext extends SymbolContextAdapter implements 
     private static final long serialVersionUID = 1L;
 
     /** Underlying {@link Map} instance. */
-    private final Map<? super Symbol<?>, Object> storage;
+    private final Map<Object, Object> storage;
 
     /**
      * Creates a new instance.
@@ -42,7 +40,7 @@ public final class DefaultSymbolContext extends SymbolContextAdapter implements 
      *            the map providing the underlying storage. It must not be
      *            {@code null}.
      */
-    public DefaultSymbolContext(Map<? super Symbol<?>, Object> map) {
+    public DefaultSymbolContext(Map<Object, Object> map) {
         storage = Objects.requireNonNull(map);
     }
 
@@ -58,7 +56,7 @@ public final class DefaultSymbolContext extends SymbolContextAdapter implements 
      * @see net.yetamine.sova.collections.SymbolContextAdapter#storage()
      */
     @Override
-    protected Map<? super Symbol<?>, Object> storage() {
+    protected Map<Object, Object> storage() {
         return storage;
     }
 }

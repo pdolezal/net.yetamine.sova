@@ -22,7 +22,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import net.yetamine.sova.core.Adaptation;
-import net.yetamine.sova.core.Symbol;
+import net.yetamine.sova.core.Mappable;
 
 /**
  * A skeletal implementation of an adapter for {@link Map}.
@@ -65,61 +65,61 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#discard(net.yetamine.sova.core.Symbol)
+     * @see net.yetamine.sova.collections.SymbolContext#discard(net.yetamine.sova.core.Mappable)
      */
-    public SymbolContext discard(Symbol<?> symbol) {
-        storage().remove(symbol);
+    public SymbolContext discard(Mappable<?, ?> symbol) {
+        storage().remove((symbol != null) ? symbol.mappable() : null);
         return this;
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#set(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#set(net.yetamine.sova.core.Mappable,
      *      java.lang.Object)
      */
-    public <T> SymbolContext set(Symbol<T> symbol, T value) {
+    public <T> SymbolContext set(Mappable<?, T> symbol, T value) {
         final Adaptation<T> adaptation = symbol.adaptation();
         final T item = adaptation.require(value);
-        storage().put(symbol, item);
+        storage().put(symbol.mappable(), item);
         return this;
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.core.Symbol)
+     * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.core.Mappable)
      */
-    public <T> T remove(Symbol<T> symbol) {
-        return (symbol != null) ? symbol.adaptation().apply(storage().remove(symbol)) : null;
+    public <T> T remove(Mappable<?, T> symbol) {
+        return (symbol != null) ? symbol.adaptation().apply(storage().remove(symbol.mappable())) : null;
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.core.Mappable,
      *      java.lang.Object)
      */
-    public boolean remove(Symbol<?> symbol, Object value) {
-        return storage().remove(symbol, value);
+    public boolean remove(Mappable<?, ?> symbol, Object value) {
+        return storage().remove((symbol != null) ? symbol.mappable() : null, value);
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#put(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#put(net.yetamine.sova.core.Mappable,
      *      java.lang.Object)
      */
-    public <T> T put(Symbol<T> symbol, T value) {
+    public <T> T put(Mappable<?, T> symbol, T value) {
         final Adaptation<T> adaptation = symbol.adaptation();
         final T item = adaptation.require(value);
-        return adaptation.apply(storage().put(symbol, item));
+        return adaptation.apply(storage().put(symbol.mappable(), item));
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#putIfAbsent(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#putIfAbsent(net.yetamine.sova.core.Mappable,
      *      java.lang.Object)
      */
-    public <T> T putIfAbsent(Symbol<T> symbol, T value) {
+    public <T> T putIfAbsent(Mappable<?, T> symbol, T value) {
         final Adaptation<T> adaptation = symbol.adaptation();
         // Thanks to the adaptation here and the adaptation within the mapping
         // function, the result shall pass the adaptation, so we can skip it
         final T item = adaptation.require(value);
 
         @SuppressWarnings("unchecked")
-        final T result = (T) storage().merge(symbol, item, (u, v) -> {
+        final T result = (T) storage().merge(symbol.mappable(), item, (u, v) -> {
             final T current = adaptation.apply(v);
             return (current != null) ? current : item;
         });
@@ -130,32 +130,32 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#replace(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#replace(net.yetamine.sova.core.Mappable,
      *      java.lang.Object, java.lang.Object)
      */
-    public <T> boolean replace(Symbol<T> symbol, Object oldValue, T newValue) {
-        return storage().replace(symbol, oldValue, symbol.adaptation().require(newValue));
+    public <T> boolean replace(Mappable<?, T> symbol, Object oldValue, T newValue) {
+        return storage().replace(symbol.mappable(), oldValue, symbol.adaptation().require(newValue));
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#replace(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#replace(net.yetamine.sova.core.Mappable,
      *      java.lang.Object)
      */
-    public <T> T replace(Symbol<T> symbol, T value) {
+    public <T> T replace(Mappable<?, T> symbol, T value) {
         final Adaptation<T> adaptation = symbol.adaptation();
         final T item = adaptation.require(value);
-        return adaptation.apply(storage().replace(symbol, item));
+        return adaptation.apply(storage().replace(symbol.mappable(), item));
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#merge(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#merge(net.yetamine.sova.core.Mappable,
      *      java.lang.Object, java.util.function.BiFunction)
      */
-    public <T> T merge(Symbol<T> symbol, T value, BiFunction<? super T, ? super T, ? extends T> remappingFunction) {
+    public <T> T merge(Mappable<?, T> symbol, T value, BiFunction<? super T, ? super T, ? extends T> remappingFunction) {
         final Adaptation<T> adaptation = symbol.adaptation();
         final T item = adaptation.require(value);
 
-        final Object result = storage().merge(symbol, item, (u, v) -> {
+        final Object result = storage().merge(symbol.mappable(), item, (u, v) -> {
             final T current = adaptation.apply(v);
             final T replace = remappingFunction.apply(item, current);
             return adaptation.require(replace);
@@ -165,14 +165,15 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#compute(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#compute(net.yetamine.sova.core.Mappable,
      *      java.util.function.BiFunction)
      */
-    public <T> T compute(Symbol<T> symbol, BiFunction<? super Symbol<T>, ? super T, ? extends T> remappingFunction) {
+    public <K, T> T compute(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remappingFunction) {
         final Adaptation<T> adaptation = symbol.adaptation();
-        final Object result = storage().compute(symbol, (k, v) -> {
+        final K key = symbol.mappable(); // Need to use it later due to correct static type
+        final Object result = storage().compute(key, (k, v) -> {
             final T current = adaptation.apply(v);
-            final T replace = remappingFunction.apply(symbol, current);
+            final T replace = remappingFunction.apply(key, current);
             return adaptation.require(replace);
         });
 
@@ -180,19 +181,19 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#computeIfAbsent(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#computeIfAbsent(net.yetamine.sova.core.Mappable,
      *      java.util.function.Function)
      */
-    public <T> T computeIfAbsent(Symbol<T> symbol, Function<? super Symbol<T>, ? extends T> mappingFunction) {
-        return compute(symbol, (t, v) -> (v == null) ? t.adaptation().require(mappingFunction.apply(t)) : v);
+    public <K, T> T computeIfAbsent(Mappable<K, T> symbol, Function<? super K, ? extends T> mappingFunction) {
+        return compute(symbol, (t, v) -> (v == null) ? symbol.adaptation().require(mappingFunction.apply(t)) : v);
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#computeIfPresent(net.yetamine.sova.core.Symbol,
+     * @see net.yetamine.sova.collections.SymbolContext#computeIfPresent(net.yetamine.sova.core.Mappable,
      *      java.util.function.BiFunction)
      */
-    public <T> T computeIfPresent(Symbol<T> symbol, BiFunction<? super Symbol<T>, ? super T, ? extends T> remappingFunction) {
-        return compute(symbol, (t, v) -> (v != null) ? t.adaptation().require(remappingFunction.apply(t, v)) : null);
+    public <K, T> T computeIfPresent(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remapping) {
+        return compute(symbol, (t, v) -> (v != null) ? symbol.adaptation().require(remapping.apply(t, v)) : null);
     }
 
     /**
@@ -202,5 +203,5 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      *
      * @return the instance of the underlying {@link Map} instance
      */
-    protected abstract Map<? super Symbol<?>, Object> storage();
+    protected abstract Map<Object, Object> storage();
 }

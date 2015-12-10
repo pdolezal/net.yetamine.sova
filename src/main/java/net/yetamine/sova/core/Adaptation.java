@@ -47,9 +47,9 @@ import java.util.function.Predicate;
  * <ul>
  * <li>{@code apply(null)} must return {@code null}.</li>
  * <li>{@code apply(x)} must be always equal {@code apply(x)} (in the terms of
- * the {@code T#equals(Object)} method implementation) for any <i>x</i>.</li>
+ * the {@code T::equals} method implementation) for any <i>x</i>.</li>
  * <li>{@code apply(x)} must be equal {@code apply(apply(x))} (in the terms of
- * the {@code T#equals(Object)} method implementation) for any <i>x</i>.</li>
+ * the {@code T::equals} method implementation) for any <i>x</i>.</li>
  * <li>All other methods must be consistent with {@link #apply(Object)}.</li>
  * <li>All methods should relay exceptions thrown by external code. Generally,
  * all methods should avoid throwing exceptions, unless an exception is meant

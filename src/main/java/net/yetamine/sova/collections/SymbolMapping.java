@@ -19,7 +19,7 @@ package net.yetamine.sova.collections;
 import java.util.Map;
 import java.util.Optional;
 
-import net.yetamine.sova.core.Symbol;
+import net.yetamine.sova.core.Mappable;
 
 /**
  * An unmodifiable symbol-based view of a {@link Map}.
@@ -95,7 +95,7 @@ public interface SymbolMapping {
      * @return the value associated with the given symbol, or {@code null} if no
      *         such value exists
      */
-    default <T> T get(Symbol<T> symbol) {
+    default <T> T get(Mappable<?, T> symbol) {
         return symbol.get(map());
     }
 
@@ -111,7 +111,7 @@ public interface SymbolMapping {
      * @return the value associated with the given symbol, or {@code null} if no
      *         such value exists
      */
-    default <T> T gain(Symbol<T> symbol) {
+    default <T> T gain(Mappable<?, T> symbol) {
         return symbol.gain(map());
     }
 
@@ -127,7 +127,7 @@ public interface SymbolMapping {
      * @return the value associated with the given symbol, or {@code null} if
      *         the value could not be adapted
      */
-    default <T> T seek(Symbol<T> symbol) {
+    default <T> T seek(Mappable<?, T> symbol) {
         return symbol.seek(map());
     }
 
@@ -143,7 +143,7 @@ public interface SymbolMapping {
      * @return an {@link Optional} containing the value associated with the
      *         given symbol, or an empty container if no such value exists
      */
-    default <T> Optional<T> find(Symbol<T> symbol) {
+    default <T> Optional<T> find(Mappable<?, T> symbol) {
         return symbol.find(map());
     }
 }

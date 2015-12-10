@@ -21,7 +21,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import net.yetamine.sova.core.AdaptationException;
-import net.yetamine.sova.core.Symbol;
+import net.yetamine.sova.core.Mappable;
 
 /**
  * A mutable symbol-based view of a {@link Map}.
@@ -62,7 +62,7 @@ public interface SymbolContext extends SymbolMapping {
      * Associates the specified value with the specified symbol.
      *
      * <p>
-     * This method is equivalent to {@link #put(Symbol, Object)}, it just
+     * This method is equivalent to {@link #put(Mappable, Object)}, it just
      * returns this instance instead of the previously associated value. This
      * method is more convenient when the previously associtated value is not
      * interesting and multiple values shall be associated easily. It may be
@@ -84,7 +84,7 @@ public interface SymbolContext extends SymbolMapping {
      *             if the value could not be associated with the specified
      *             symbol
      */
-    default <T> SymbolContext set(Symbol<T> symbol, T value) {
+    default <T> SymbolContext set(Mappable<?, T> symbol, T value) {
         put(symbol, value);
         return this;
     }
@@ -94,7 +94,7 @@ public interface SymbolContext extends SymbolMapping {
      * contains no association for the specified symbol yet.
      *
      * <p>
-     * This method is equivalent to {@link #putIfAbsent(Symbol, Object)}, it
+     * This method is equivalent to {@link #putIfAbsent(Mappable, Object)}, it
      * just returns this instance instead. This method is more convenient if
      * multiple values shall be associated easily and the possibly associated
      * previous values are not interesting. It may be more efficient.
@@ -115,7 +115,7 @@ public interface SymbolContext extends SymbolMapping {
      *             if the value could not be associated with the specified
      *             symbol
      */
-    default <T> SymbolContext add(Symbol<T> symbol, T value) {
+    default <T> SymbolContext add(Mappable<?, T> symbol, T value) {
         putIfAbsent(symbol, value);
         return this;
     }
@@ -134,7 +134,7 @@ public interface SymbolContext extends SymbolMapping {
      * Removes an entry for the specified symbol.
      *
      * <p>
-     * This method is equivalent to {@link #remove(Symbol)}, it just returns
+     * This method is equivalent to {@link #remove(Mappable)}, it just returns
      * this instance instead. This method is more convenient if multiple values
      * shall be removed and the possibly removed values are not interesting.
      *
@@ -146,7 +146,7 @@ public interface SymbolContext extends SymbolMapping {
      * @throws UnsupportedOperationException
      *             if the operation is not supported for the specified symbol
      */
-    SymbolContext discard(Symbol<?> symbol);
+    SymbolContext discard(Mappable<?, ?> symbol);
 
     /**
      * Removes an entry for the specified symbol.
@@ -161,7 +161,7 @@ public interface SymbolContext extends SymbolMapping {
      * @throws UnsupportedOperationException
      *             if the operation is not supported for the specified symbol
      */
-    <T> T remove(Symbol<T> symbol);
+    <T> T remove(Mappable<?, T> symbol);
 
     /**
      * Removes an entry for the specified symbol if the symbol maps to the given
@@ -178,7 +178,7 @@ public interface SymbolContext extends SymbolMapping {
      * @throws UnsupportedOperationException
      *             if the operation is not supported for the specified symbol
      */
-    boolean remove(Symbol<?> symbol, Object value);
+    boolean remove(Mappable<?, ?> symbol, Object value);
 
     /**
      * Associates the specified value with the specified symbol.
@@ -200,7 +200,7 @@ public interface SymbolContext extends SymbolMapping {
      *             if the value could not be associated with the specified
      *             symbol
      */
-    <T> T put(Symbol<T> symbol, T value);
+    <T> T put(Mappable<?, T> symbol, T value);
 
     /**
      * Associates the specified value with the specified symbol if the symbol is
@@ -223,7 +223,7 @@ public interface SymbolContext extends SymbolMapping {
      *             if the value could not be associated with the specified
      *             symbol
      */
-    <T> T putIfAbsent(Symbol<T> symbol, T value);
+    <T> T putIfAbsent(Mappable<?, T> symbol, T value);
 
     /**
      * Replaces the entry for the specified symbol only if currently associated
@@ -247,7 +247,7 @@ public interface SymbolContext extends SymbolMapping {
      * @throws UnsupportedOperationException
      *             if a value could not be associated with the specified symbol
      */
-    <T> boolean replace(Symbol<T> symbol, Object oldValue, T newValue);
+    <T> boolean replace(Mappable<?, T> symbol, Object oldValue, T newValue);
 
     /**
      * Replaces the entry for the specified symbol only if it is currently
@@ -269,7 +269,7 @@ public interface SymbolContext extends SymbolMapping {
      * @throws UnsupportedOperationException
      *             if a value could not be associated with the specified symbol
      */
-    <T> T replace(Symbol<T> symbol, T value);
+    <T> T replace(Mappable<?, T> symbol, T value);
 
     /**
      * Associates the specified symbol, if the symbol is not already associated
@@ -295,12 +295,14 @@ public interface SymbolContext extends SymbolMapping {
      * @throws UnsupportedOperationException
      *             if a value could not be associated with the specified symbol
      */
-    <T> T merge(Symbol<T> symbol, T value, BiFunction<? super T, ? super T, ? extends T> remappingFunction);
+    <T> T merge(Mappable<?, T> symbol, T value, BiFunction<? super T, ? super T, ? extends T> remappingFunction);
 
     /**
      * Attempts to compute a mapping for the specified symbol and its current
      * mapped value (or {@code null} if there is no current mapping).
      *
+     * @param <K>
+     *            the type of the mapping key
      * @param <T>
      *            the type of the value
      * @param symbol
@@ -317,12 +319,14 @@ public interface SymbolContext extends SymbolMapping {
      * @throws UnsupportedOperationException
      *             if a value could not be associated with the specified symbol
      */
-    <T> T compute(Symbol<T> symbol, BiFunction<? super Symbol<T>, ? super T, ? extends T> remappingFunction);
+    <K, T> T compute(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remappingFunction);
 
     /**
      * Attempts to compute a mapping for the specified symbol only if the symbol
      * is not associated yet.
      *
+     * @param <K>
+     *            the type of the mapping key
      * @param <T>
      *            the type of the value
      * @param symbol
@@ -340,12 +344,14 @@ public interface SymbolContext extends SymbolMapping {
      * @throws UnsupportedOperationException
      *             if a value could not be associated with the specified symbol
      */
-    <T> T computeIfAbsent(Symbol<T> symbol, Function<? super Symbol<T>, ? extends T> mappingFunction);
+    <K, T> T computeIfAbsent(Mappable<K, T> symbol, Function<? super K, ? extends T> mappingFunction);
 
     /**
      * Attempts to compute a mapping for the specified symbol only if the symbol
      * is associated already to some value.
      *
+     * @param <K>
+     *            the type of the mapping key
      * @param <T>
      *            the type of the value
      * @param symbol
@@ -362,5 +368,5 @@ public interface SymbolContext extends SymbolMapping {
      * @throws UnsupportedOperationException
      *             if a value could not be associated with the specified symbol
      */
-    <T> T computeIfPresent(Symbol<T> symbol, BiFunction<? super Symbol<T>, ? super T, ? extends T> remappingFunction);
+    <K, T> T computeIfPresent(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remappingFunction);
 }
