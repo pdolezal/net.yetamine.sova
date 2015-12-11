@@ -89,17 +89,17 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#gain(java.util.function.Function)
+     * @see net.yetamine.sova.core.Symbol#getOrDefault(java.util.function.Function)
      */
-    public final T gain(Function<? super Symbol<T>, ?> source) {
-        return Symbol.super.gain(source);
+    public final T getOrDefault(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.getOrDefault(source);
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#seek(java.util.function.Function)
+     * @see net.yetamine.sova.core.Symbol#findOrDefault(java.util.function.Function)
      */
-    public final T seek(Function<? super Symbol<T>, ?> source) {
-        return Symbol.super.seek(source);
+    public final T findOrDefault(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.findOrDefault(source);
     }
 
     /**
@@ -150,17 +150,17 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#gain(java.util.Map)
+     * @see net.yetamine.sova.core.Symbol#getOrDefault(java.util.Map)
      */
-    public final T gain(Map<?, ?> source) {
-        return Symbol.super.gain(source);
+    public final T getOrDefault(Map<?, ?> source) {
+        return Symbol.super.getOrDefault(source);
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#seek(java.util.Map)
+     * @see net.yetamine.sova.core.Symbol#findOrDefault(java.util.Map)
      */
-    public final T seek(Map<?, ?> source) {
-        return Symbol.super.seek(source);
+    public final T findOrDefault(Map<?, ?> source) {
+        return Symbol.super.findOrDefault(source);
     }
 
     /**

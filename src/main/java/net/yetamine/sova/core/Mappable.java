@@ -74,9 +74,23 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * @return the result of the adaptation, or the fallback if the adaptation
      *         input is missing
      */
-    default V gain(Function<? super K, ?> source) {
+    default V getOrDefault(Function<? super K, ?> source) {
         final Object object = source.apply(mapping());
         return (object != null) ? adaptation().apply(object) : fallback();
+    }
+
+    /**
+     * Adapts the object provided by a {@link Function} with {@link #mapping()}
+     * as its input.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the {@link Optional} with the result of the adaptation
+     */
+    default Optional<V> find(Function<? super K, ?> source) {
+        return adaptation().attempt(source.apply(mapping()));
     }
 
     /**
@@ -91,7 +105,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * @return the result of the adaptation or the fallback (which still may
      *         return {@code null})
      */
-    default V seek(Function<? super K, ?> source) {
+    default V findOrDefault(Function<? super K, ?> source) {
         return find(source).orElseGet(fallbackSupplier());
     }
 
@@ -143,20 +157,6 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      */
     default V require(Function<? super K, ?> source) {
         return require(source, o -> new NoSuchElementException(String.format("Missing item: %s", o)));
-    }
-
-    /**
-     * Adapts the object provided by a {@link Function} with {@link #mapping()}
-     * as its input.
-     *
-     * @param source
-     *            the source of the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the {@link Optional} with the result of the adaptation
-     */
-    default Optional<V> find(Function<? super K, ?> source) {
-        return adaptation().attempt(source.apply(mapping()));
     }
 
     /**
@@ -214,9 +214,23 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * @return the result of the adaptation, or the fallback if the adaptation
      *         input is missing
      */
-    default V gain(Map<?, ?> source) {
+    default V getOrDefault(Map<?, ?> source) {
         final Object object = source.get(mapping());
         return (object != null) ? adaptation().apply(object) : fallback();
+    }
+
+    /**
+     * Adapts the object taken from a {@link Map} with {@link #mapping()} as the
+     * key.
+     *
+     * @param source
+     *            the map providing the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the {@link Optional} with the result of the adaptation
+     */
+    default Optional<V> find(Map<?, ?> source) {
+        return adaptation().attempt(source.get(mapping()));
     }
 
     /**
@@ -231,7 +245,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * @return the result of the adaptation or the fallback (which still may
      *         return {@code null})
      */
-    default V seek(Map<?, ?> source) {
+    default V findOrDefault(Map<?, ?> source) {
         return find(source).orElseGet(fallbackSupplier());
     }
 
@@ -283,20 +297,6 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      */
     default V require(Map<?, ?> source) {
         return require(source, o -> new NoSuchElementException(String.format("Missing item: %s", o)));
-    }
-
-    /**
-     * Adapts the object taken from a {@link Map} with {@link #mapping()} as the
-     * key.
-     *
-     * @param source
-     *            the map providing the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the {@link Optional} with the result of the adaptation
-     */
-    default Optional<V> find(Map<?, ?> source) {
-        return adaptation().attempt(source.get(mapping()));
     }
 
     /**

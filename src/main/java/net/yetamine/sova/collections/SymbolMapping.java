@@ -115,29 +115,14 @@ public interface SymbolMapping {
      * @param <T>
      *            the type of the result
      * @param symbol
-     *            the symbol whose associated value is to be returned
+     *            the symbol whose associated value is to be returned. It must
+     *            not be {@code null}.
      *
      * @return the value associated with the given symbol, or {@code null} if no
      *         such value exists
      */
-    default <T> T gain(Mappable<?, T> symbol) {
-        return symbol.gain(map());
-    }
-
-    /**
-     * Returns the value associated with the given symbol, or the fallback of
-     * the symbol if the value could be adapted.
-     *
-     * @param <T>
-     *            the type of the result
-     * @param symbol
-     *            the symbol whose associated value is to be returned
-     *
-     * @return the value associated with the given symbol, or {@code null} if
-     *         the value could not be adapted
-     */
-    default <T> T seek(Mappable<?, T> symbol) {
-        return symbol.seek(map());
+    default <T> T getOrDefault(Mappable<?, T> symbol) {
+        return symbol.getOrDefault(map());
     }
 
     /**
@@ -147,12 +132,77 @@ public interface SymbolMapping {
      * @param <T>
      *            the type of the result
      * @param symbol
-     *            the symbol whose associated value is to be returned
+     *            the symbol whose associated value is to be returned. It must
+     *            not be {@code null}.
      *
      * @return an {@link Optional} containing the value associated with the
      *         given symbol, or an empty container if no such value exists
      */
     default <T> Optional<T> find(Mappable<?, T> symbol) {
         return symbol.find(map());
+    }
+
+    /**
+     * Returns the value associated with the given symbol, or the fallback of
+     * the symbol if the value could be adapted.
+     *
+     * @param <T>
+     *            the type of the result
+     * @param symbol
+     *            the symbol whose associated value is to be returned. It must
+     *            not be {@code null}.
+     *
+     * @return the value associated with the given symbol, or {@code null} if
+     *         the value could not be adapted
+     */
+    default <T> T findOrDefault(Mappable<?, T> symbol) {
+        return symbol.findOrDefault(map());
+    }
+
+    /**
+     * Returns the value associated with the given symbol or the fallback of the
+     * symbol result if the if the value could not be adapted.
+     *
+     * @param <K>
+     *            the type of the key
+     * @param <T>
+     *            the type of the result
+     * @param <X>
+     *            the type of the exception to throw if the method fails to
+     *            return a non-{@code null} result
+     * @param symbol
+     *            the symbol whose associated value is to be returned. It must
+     *            not be {@code null}.
+     * @param exception
+     *            the function that gets the key of the failing entry and shall
+     *            return the exception to throw. It must not be {@code null}.
+     *
+     * @return the value associated with the given symbol or the fallback
+     *
+     * @throws X
+     *             if both the no value is associated with the symbol and the
+     *             fallback returns {@code null}
+     */
+    default <K, T, X extends Throwable> T require(Mappable<K, T> symbol, Function<? super K, ? extends X> exception) throws X {
+        return symbol.require(map(), exception);
+    }
+
+    /**
+     * Returns the value associated with the given symbol or the fallback of the
+     * symbol result if the if the value could not be adapted.
+     *
+     * @param <T>
+     *            the type of the result
+     * @param symbol
+     *            the symbol whose associated value is to be returned. It must
+     *            not be {@code null}.
+     *
+     * @return the value associated with the given symbol or the fallback
+     *
+     * @throws NoSuchElementException
+     *             if both the adaptation and fallback returns {@code null}
+     */
+    default <T> T require(Mappable<?, T> symbol) {
+        return symbol.require(map());
     }
 }
