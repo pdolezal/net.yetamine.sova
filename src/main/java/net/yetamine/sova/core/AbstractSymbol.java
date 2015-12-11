@@ -103,6 +103,21 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
+     * @see net.yetamine.sova.core.Mappable#require(java.util.function.Function,
+     *      java.util.function.Function)
+     */
+    public final <X extends Throwable> T require(Function<? super Symbol<T>, ?> source, Function<? super Symbol<T>, ? extends X> exception) throws X {
+        return Symbol.super.require(source, exception);
+    }
+
+    /**
+     * @see net.yetamine.sova.core.Mappable#require(java.util.function.Function)
+     */
+    public final T require(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.require(source);
+    }
+
+    /**
      * @see net.yetamine.sova.core.Symbol#find(java.util.function.Function)
      */
     public final Optional<T> find(Function<? super Symbol<T>, ?> source) {
@@ -146,6 +161,21 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
      */
     public final T seek(Map<?, ?> source) {
         return Symbol.super.seek(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.core.Mappable#require(java.util.Map,
+     *      java.util.function.Function)
+     */
+    public final <X extends Throwable> T require(Map<?, ?> source, Function<? super Symbol<T>, ? extends X> exception) throws X {
+        return Symbol.super.require(source, exception);
+    }
+
+    /**
+     * @see net.yetamine.sova.core.Mappable#require(java.util.Map)
+     */
+    public final T require(Map<?, ?> source) {
+        return Symbol.super.require(source);
     }
 
     /**

@@ -17,6 +17,7 @@
 package net.yetamine.sova.core;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -95,6 +96,56 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
     }
 
     /**
+     * Returns the adaptation of the object provided by a {@link Function} with
+     * {@link #mapping()} as its input or the {@link #fallback()} result if the
+     * adaptation returns {@code null} for whatever reason.
+     *
+     * @param <X>
+     *            the type of the exception to throw if the method fails to
+     *            return a non-{@code null} result
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     * @param exception
+     *            the function that gets the key of the failing entry and shall
+     *            return the exception to throw. It must not be {@code null}.
+     *
+     * @return the result of the adaptation or the fallback
+     *
+     * @throws X
+     *             if both the adaptation and fallback returns {@code null}
+     */
+    default <X extends Throwable> V require(Function<? super K, ?> source, Function<? super K, ? extends X> exception) throws X {
+        final K key = mapping();
+        final Object object = source.apply(key);
+        final V result = (object != null) ? adaptation().apply(object) : fallback();
+
+        if (result == null) {
+            throw exception.apply(key);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns the adaptation of the object provided by a {@link Function} with
+     * {@link #mapping()} as its input or the {@link #fallback()} result if the
+     * adaptation returns {@code null} for whatever reason.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the result of the adaptation or the fallback
+     *
+     * @throws NoSuchElementException
+     *             if both the adaptation and fallback returns {@code null}
+     */
+    default V require(Function<? super K, ?> source) {
+        return require(source, o -> new NoSuchElementException(String.format("Missing item: %s", o)));
+    }
+
+    /**
      * Adapts the object provided by a {@link Function} with {@link #mapping()}
      * as its input.
      *
@@ -138,8 +189,8 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
     // Map-based access methods
 
     /**
-     * Adapts the object taken from a {@link Map} with {@link #mapping()} as
-     * the key.
+     * Adapts the object taken from a {@link Map} with {@link #mapping()} as the
+     * key.
      *
      * @param source
      *            the map providing the argument to adapt. It must not be
@@ -169,8 +220,8 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
     }
 
     /**
-     * Adapts the object taken from a {@link Map} with {@link #mapping()} as
-     * the key, or returns the {@link #fallback()} if the adaptation returns
+     * Adapts the object taken from a {@link Map} with {@link #mapping()} as the
+     * key, or returns the {@link #fallback()} if the adaptation returns
      * {@code null} for whatever reason.
      *
      * @param source
@@ -185,8 +236,58 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
     }
 
     /**
-     * Adapts the object taken from a {@link Map} with {@link #mapping()} as
-     * the key.
+     * Returns the adaptation of the object taken from a {@link Map} with
+     * {@link #mapping()} as the key or the {@link #fallback()} result if the
+     * adaptation returns {@code null} for whatever reason.
+     *
+     * @param <X>
+     *            the type of the exception to throw if the method fails to
+     *            return a non-{@code null} result
+     * @param source
+     *            the map providing the argument to adapt. It must not be
+     *            {@code null}.
+     * @param exception
+     *            the function that gets the key of the failing entry and shall
+     *            return the exception to throw. It must not be {@code null}.
+     *
+     * @return the result of the adaptation or the fallback
+     *
+     * @throws X
+     *             if both the adaptation and fallback returns {@code null}
+     */
+    default <X extends Throwable> V require(Map<?, ?> source, Function<? super K, ? extends X> exception) throws X {
+        final K key = mapping();
+        final Object object = source.get(key);
+        final V result = (object != null) ? adaptation().apply(object) : fallback();
+
+        if (result == null) {
+            throw exception.apply(key);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns the adaptation of the object taken from a {@link Map} with
+     * {@link #mapping()} as the key the {@link #fallback()} result if the
+     * adaptation returns {@code null} for whatever reason.
+     *
+     * @param source
+     *            the map providing the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the result of the adaptation or the fallback
+     *
+     * @throws NoSuchElementException
+     *             if both the adaptation and fallback returns {@code null}
+     */
+    default V require(Map<?, ?> source) {
+        return require(source, o -> new NoSuchElementException(String.format("Missing item: %s", o)));
+    }
+
+    /**
+     * Adapts the object taken from a {@link Map} with {@link #mapping()} as the
+     * key.
      *
      * @param source
      *            the map providing the argument to adapt. It must not be
