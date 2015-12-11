@@ -17,7 +17,9 @@
 package net.yetamine.sova.collections;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 
 import net.yetamine.sova.core.Mappable;
 
@@ -52,7 +54,8 @@ public interface SymbolMapping {
 
     /**
      * Compares the specified object with this instance for equality and returns
-     * {@code true} iff the object provides equal {@link SymbolMapping#map()} view too.
+     * {@code true} iff the object provides equal {@link SymbolMapping#map()}
+     * view too.
      *
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -90,7 +93,8 @@ public interface SymbolMapping {
      * @param <T>
      *            the type of the result
      * @param symbol
-     *            the symbol whose associated value is to be returned
+     *            the symbol whose associated value is to be returned. It must
+     *            not be {@code null}.
      *
      * @return the value associated with the given symbol, or {@code null} if no
      *         such value exists

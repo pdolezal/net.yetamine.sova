@@ -139,7 +139,8 @@ public interface SymbolContext extends SymbolMapping {
      * shall be removed and the possibly removed values are not interesting.
      *
      * @param symbol
-     *            the symbol identifying the value to be removed
+     *            the symbol identifying the value to be removed. It must not be
+     *            {@code null}.
      *
      * @return this instance
      *
@@ -154,7 +155,8 @@ public interface SymbolContext extends SymbolMapping {
      * @param <T>
      *            the type of the result
      * @param symbol
-     *            the symbol identifying the value to be removed
+     *            the symbol identifying the value to be removed. It must not be
+     *            {@code null}.
      *
      * @return the removed value, or {@code null} if no such value exists
      *
@@ -168,7 +170,8 @@ public interface SymbolContext extends SymbolMapping {
      * value.
      *
      * @param symbol
-     *            the symbol identifying the value to be removed
+     *            the symbol identifying the value to be removed. It must not be
+     *            {@code null}.
      * @param value
      *            the value to be removed
      *
