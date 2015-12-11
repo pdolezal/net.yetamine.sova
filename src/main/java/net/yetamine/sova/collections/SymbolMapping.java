@@ -38,6 +38,11 @@ import net.yetamine.sova.core.Mappable;
  * sometimes useful for the interoperability via the {@link #map()} view.
  *
  * <p>
+ * Using {@code null} for the symbol arguments is prohibited (consistently with
+ * prohibiting {@code null} values). When suitable or necessary, it is possible
+ * to use {@link Mappable#nulling()} as a surrogate for a {@code null} symbol.
+ *
+ * <p>
  * The interface is designed as read-only; however, changing the content might
  * be possible anyway: an implementation may offer yet a mutable interface for
  * the content, or an implementation may allow removing entries via the view.

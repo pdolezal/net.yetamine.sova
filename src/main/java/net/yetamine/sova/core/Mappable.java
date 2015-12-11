@@ -329,4 +329,20 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
     default Object set(Map<? super K, ? super V> consumer, Object value) {
         return put(consumer, adaptation().apply(value));
     }
+
+    /**
+     * Returns an instance that adapts anything to {@code null}, provides only
+     * {@code null} as the fallback and returns {@code null} mapping.
+     *
+     * @param <K>
+     *            the type of the mappable key
+     * @param <V>
+     *            the type of resulting values
+     *
+     * @return an instance that reduces anything to {@code null}
+     */
+    @SuppressWarnings("unchecked")
+    static <K, V> Mappable<K, V> nulling() {
+        return (Mappable<K, V>) DefaultMappable.NULL;
+    }
 }

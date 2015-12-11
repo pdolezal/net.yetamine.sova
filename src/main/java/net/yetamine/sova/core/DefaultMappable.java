@@ -29,6 +29,17 @@ import java.util.function.Supplier;
  */
 public final class DefaultMappable<K, V> implements Mappable<K, V> {
 
+    /**
+     * Implementation of {@link Mappable#nulling()} result.
+     *
+     * <p>
+     * The instance is stateless and accepts any instance as well as producing
+     * only {@code null} results which are compatible with any type, therefore
+     * the instance can be used for any generic types.
+     */
+    static final Mappable<Object, Object> NULL // @formatter:break
+    = new DefaultMappable<>(Downcasting.withFilter(Object.class, o -> false), () -> null);
+
     /** Implementation of the adaptation part. */
     private final AdaptationStrategy<V> adaptation;
     /** Supplier of the mappable values. */
