@@ -96,6 +96,13 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
+     * @see net.yetamine.sova.core.Mappable#findOptional(java.util.function.Function)
+     */
+    public final Optional<T> findOptional(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.findOptional(source);
+    }
+
+    /**
      * @see net.yetamine.sova.core.Symbol#findOrDefault(java.util.function.Function)
      */
     public final T findOrDefault(Function<? super Symbol<T>, ?> source) {

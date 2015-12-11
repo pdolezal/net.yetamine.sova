@@ -143,6 +143,22 @@ public interface SymbolMapping {
     }
 
     /**
+     * Returns an {@link Optional} containing the value associated with the
+     * given symbol or the fallback.
+     *
+     * @param <T>
+     *            the type of the result
+     * @param symbol
+     *            the symbol whose associated value is to be returned. It must
+     *            not be {@code null}.
+     *
+     * @return the {@link Optional} containing the result
+     */
+    default <T> Optional<T> findOptional(Mappable<?, T> symbol) {
+        return symbol.findOptional(map());
+    }
+
+    /**
      * Returns the value associated with the given symbol, or the fallback of
      * the symbol if the value could be adapted.
      *

@@ -94,6 +94,23 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
     }
 
     /**
+     * Adapts the value provided by a {@link Function} with {@link #mapping()}
+     * as its input; if the returned value is {@code null}, {@link #fallback()}
+     * result is returned instead. The result is returned as an {@link Optional}
+     * for the case that the fallback value is also {@code null}, so that it may
+     * be processed in a {@code null}-safe way further.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the {@link Optional} containing the result
+     */
+    default Optional<V> findOptional(Function<? super K, ?> source) {
+        return Optional.ofNullable(getOrDefault(source));
+    }
+
+    /**
      * Adapts the object provided by a {@link Function} with {@link #mapping()}
      * as its input, or returns the {@link #fallback()} if the adaptation
      * returns {@code null} for whatever reason.
@@ -231,6 +248,23 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      */
     default Optional<V> find(Map<?, ?> source) {
         return adaptation().attempt(source.get(mapping()));
+    }
+
+    /**
+     * Adapts the value taken from a {@link Map} with {@link #mapping()} as the
+     * key; if the returned value is {@code null}, {@link #fallback()} result is
+     * returned instead. The result is returned as an {@link Optional} for the
+     * case that the fallback value is also {@code null}, so that it may be
+     * processed in a {@code null}-safe way further.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the {@link Optional} containing the result
+     */
+    default Optional<V> findOptional(Map<?, ?> source) {
+        return Optional.ofNullable(getOrDefault(source));
     }
 
     /**
