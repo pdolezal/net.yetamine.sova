@@ -68,7 +68,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      * @see net.yetamine.sova.collections.SymbolContext#discard(net.yetamine.sova.core.Mappable)
      */
     public SymbolContext discard(Mappable<?, ?> symbol) {
-        storage().remove(symbol.mapping());
+        storage().remove(symbol.remap());
         return this;
     }
 
@@ -77,9 +77,8 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      *      java.lang.Object)
      */
     public <T> SymbolContext set(Mappable<?, T> symbol, T value) {
-        final Adaptation<T> adaptation = symbol.adaptation();
-        final T item = adaptation.require(value);
-        storage().put(symbol.mapping(), item);
+        final T item = symbol.adapt(value).request();
+        storage().put(symbol.remap(), item);
         return this;
     }
 
@@ -87,7 +86,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.core.Mappable)
      */
     public <T> T remove(Mappable<?, T> symbol) {
-        return symbol.adaptation().apply(storage().remove(symbol.mapping()));
+        return symbol.apply(storage().remove(symbol.remap()));
     }
 
     /**
@@ -95,7 +94,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      *      java.lang.Object)
      */
     public boolean remove(Mappable<?, ?> symbol, Object value) {
-        return storage().remove(symbol.mapping(), value);
+        return storage().remove(symbol.remap(), value);
     }
 
     /**
@@ -103,9 +102,8 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      *      java.lang.Object)
      */
     public <T> T put(Mappable<?, T> symbol, T value) {
-        final Adaptation<T> adaptation = symbol.adaptation();
-        final T item = adaptation.require(value);
-        return adaptation.apply(storage().put(symbol.mapping(), item));
+        final T item = symbol.adapt(value).request();
+        return symbol.apply(storage().put(symbol.remap(), item));
     }
 
     /**
@@ -113,19 +111,15 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      *      java.lang.Object)
      */
     public <T> T putIfAbsent(Mappable<?, T> symbol, T value) {
-        final Adaptation<T> adaptation = symbol.adaptation();
-        // Thanks to the adaptation here and the adaptation within the mapping
-        // function, the result shall pass the adaptation, so we can skip it
-        final T item = adaptation.require(value);
+        final T item = symbol.adapt(value).request();
 
         @SuppressWarnings("unchecked")
-        final T result = (T) storage().merge(symbol.mapping(), item, (u, v) -> {
-            final T current = adaptation.apply(v);
-            return (current != null) ? current : item;
+        final T result = (T) storage().merge(symbol.remap(), item, (u, v) -> {
+            return symbol.resolve(v).orElse(item);
         });
 
         // Verify that the result is either null, or is equal to what the adaptation would return
-        assert ((result == null) || result.equals(adaptation.apply(result)));
+        assert((result == null) || result.equals(symbol.apply(result)));
         return result;
     }
 
@@ -134,7 +128,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      *      java.lang.Object, java.lang.Object)
      */
     public <T> boolean replace(Mappable<?, T> symbol, Object oldValue, T newValue) {
-        return storage().replace(symbol.mapping(), oldValue, symbol.adaptation().require(newValue));
+        return storage().replace(symbol.remap(), oldValue, symbol.adapt(newValue).request());
     }
 
     /**
@@ -142,26 +136,24 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      *      java.lang.Object)
      */
     public <T> T replace(Mappable<?, T> symbol, T value) {
-        final Adaptation<T> adaptation = symbol.adaptation();
-        final T item = adaptation.require(value);
-        return adaptation.apply(storage().replace(symbol.mapping(), item));
+        final T item = symbol.adapt(value).request();
+        return symbol.apply(storage().replace(symbol.remap(), item));
     }
 
     /**
      * @see net.yetamine.sova.collections.SymbolContext#merge(net.yetamine.sova.core.Mappable,
      *      java.lang.Object, java.util.function.BiFunction)
      */
-    public <T> T merge(Mappable<?, T> symbol, T value, BiFunction<? super T, ? super T, ? extends T> remappingFunction) {
-        final Adaptation<T> adaptation = symbol.adaptation();
-        final T item = adaptation.require(value);
+    public <T> T merge(Mappable<?, T> symbol, T value, BiFunction<? super T, ? super T, ? extends T> remapping) {
+        final T item = symbol.adapt(value).request();
 
-        final Object result = storage().merge(symbol.mapping(), item, (u, v) -> {
-            final T current = adaptation.apply(v);
-            final T replace = remappingFunction.apply(item, current);
-            return adaptation.require(replace);
+        final Object result = storage().merge(symbol.remap(), item, (u, v) -> {
+            final T current = symbol.apply(v);
+            final T replace = remapping.apply(item, current);
+            return symbol.adapt(replace).request();
         });
 
-        return adaptation.apply(result);
+        return symbol.apply(result);
     }
 
     /**
@@ -170,11 +162,11 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      */
     public <K, T> T compute(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remappingFunction) {
         final Adaptation<T> adaptation = symbol.adaptation();
-        final K key = symbol.mapping(); // Need to use it later due to correct static type
+        final K key = symbol.remap(); // Need to use it later due to correct static type
         final Object result = storage().compute(key, (k, v) -> {
             final T current = adaptation.apply(v);
             final T replace = remappingFunction.apply(key, current);
-            return adaptation.require(replace);
+            return symbol.adapt(replace).request();
         });
 
         return adaptation.apply(result);
@@ -185,7 +177,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      *      java.util.function.Function)
      */
     public <K, T> T computeIfAbsent(Mappable<K, T> symbol, Function<? super K, ? extends T> mappingFunction) {
-        return compute(symbol, (t, v) -> (v == null) ? symbol.adaptation().require(mappingFunction.apply(t)) : v);
+        return compute(symbol, (t, v) -> (v == null) ? symbol.adapt(mappingFunction.apply(t)).request() : v);
     }
 
     /**
@@ -193,7 +185,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      *      java.util.function.BiFunction)
      */
     public <K, T> T computeIfPresent(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remapping) {
-        return compute(symbol, (t, v) -> (v != null) ? symbol.adaptation().require(remapping.apply(t, v)) : null);
+        return compute(symbol, (t, v) -> (v != null) ? symbol.adapt(remapping.apply(t, v)).request() : null);
     }
 
     /**

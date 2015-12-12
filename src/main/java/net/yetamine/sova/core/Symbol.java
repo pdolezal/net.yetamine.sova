@@ -17,25 +17,34 @@
 package net.yetamine.sova.core;
 
 /**
- * A smart type-safe key for using with heterogenous containers and data
- * handlers.
- *
+ * An extension of the {@link Mappable} interface that enables using self as the
+ * key directly.
+ * 
  * <p>
- * A symbol encapsulates the type constraint of the value that the symbol shall
- * refer to and provides an adaptation strategy for adapting any suitable input
- * object to the desired type.
- *
- * <p>
- * The conditional adaptation capability of a symbol is a powerful feature that
- * allows safe access to any values stored in a heterogenous container as long
- * as the values are associated with the correct symbols. Since symbols should
- * be used as keys in map-like containers, all implementations must be (at
- * least) effectively immutable.
+ * In order to support this essential requirement and feature of this interface,
+ * all implementations have to provide a well-defined equality support and keep
+ * {@link #remap()} returning {@code this} always.
  *
  * @param <T>
  *            the type of resulting values
  */
 public interface Symbol<T> extends Mappable<Symbol<T>, T> {
+
+    /**
+     * Returns this instance.
+     * 
+     * <p>
+     * This method may be overridden in order to change its return type, but it
+     * must always return {@code this} even then. Overriding, however, can't be
+     * recommended much as it may impose some overhead and is rarely necessary.
+     * 
+     * @return {@code this}
+     * 
+     * @see net.yetamine.sova.core.Mappable#remap()
+     */
+    default Symbol<T> remap() {
+        return this;
+    }
 
     // Equality definition
 
@@ -74,13 +83,4 @@ public interface Symbol<T> extends Mappable<Symbol<T>, T> {
      * @see Object#equals(Object)
      */
     int hashCode();
-
-    // Support for mapping
-
-    /**
-     * @see net.yetamine.sova.core.Mappable#mapping()
-     */
-    default Symbol<T> mapping() {
-        return this;
-    }
 }

@@ -18,7 +18,7 @@ package net.yetamine.sova.symbols;
 
 import java.util.Map;
 
-import net.yetamine.sova.core.AdaptationStrategy;
+import net.yetamine.sova.core.AdaptationProvider;
 import net.yetamine.sova.core.DelegatingSymbol;
 import net.yetamine.sova.core.Downcasting;
 
@@ -45,11 +45,11 @@ public class InternalSymbol<T> extends DelegatingSymbol<T> {
     /**
      * Creates a new instance.
      *
-     * @param adaptation
-     *            the adaptation implementation. It must not be {@code null}.
+     * @param provider
+     *            the adaptation provider. It must not be {@code null}.
      */
-    public InternalSymbol(AdaptationStrategy<T> adaptation) {
-        super(adaptation);
+    public InternalSymbol(AdaptationProvider<T> provider) {
+        super(provider);
     }
 
     /**

@@ -17,352 +17,50 @@
 package net.yetamine.sova.core;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
- * An adaptation strategy that allows using self as a generic mapping strategy.
- *
+ * An adaptation strategy that can remap self to a different type and/or object.
+ * This capability allows to use instances of this interface as adaptive keys in
+ * various map-like structures and with various mapping strategies.
+ * 
+ * <p>
+ * This interface extends the offer of adaptation methods with new methods which
+ * interact with other common types like {@link Function} and {@link BiConsumer}
+ * or {@link Map}. Inherited types are expected to add new overloads of these
+ * methods to support interaction with additional types, that are substantial
+ * with the respect to the intended use. However, all those method should follow
+ * the same pattern, so that all the methods behave consistently. Following list
+ * depicts the points to follow:
+ * 
+ * <ul>
+ * <li>All methods that read some data should have a single parameter for the
+ * data source. The data source is supposed to accept {@link #remap()} as the
+ * input for providing the data to adapt.</li>
+ * <li>All methods that store some data should have two parameters: the first as
+ * the data target, the second as the value to be stored. The data target should
+ * accept {@link #remap()} as the key.</li>
+ * <li>A {@code get} method should use {@link #apply(Object)} to adapt the
+ * result of the data source.</li>
+ * <li>A {@code use} method should use {@link #recover(Object)} to adapt the
+ * result of the data source.</li>
+ * <li>A {@code find} method should use {@link #resolve(Object)} to adapt the
+ * result of the data source.</li>
+ * <li>A {@code yield} method should use {@link #adapt(Object)} to adapt the
+ * result of the data source.</li>
+ * <li>A {@code put} method should just store the value.</li>
+ * <li>A {@code set} method should use {@link #apply(Object)} to adapt the value
+ * and store the result, using the {@code put} variant.</li>
+ * </ul>
+ * 
  * @param <K>
- *            the type of the mappable key
+ *            the type of the remapping result
  * @param <V>
  *            the type of resulting values
  */
 public interface Mappable<K, V> extends AdaptationStrategy<V> {
-
-    /**
-     * Returns the mapping key for this instance.
-     *
-     * <p>
-     * This method must return always equal values (and it is preferred to use
-     * immutable ones, or at least effectively immutable); the values therefore
-     * must have properly implemented and well-defined equality to be usable as
-     * keys.
-     *
-     * @return the mapping key for this instance, which should never be
-     *         {@code null}
-     */
-    K mapping();
-
-    // Generic access methods
-
-    /**
-     * Adapts the object provided by a {@link Function} with {@link #mapping()}
-     * as its input.
-     *
-     * @param source
-     *            the source of the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the result of the adaptation, or {@code null} if not possible
-     */
-    default V get(Function<? super K, ?> source) {
-        return adaptation().apply(source.apply(mapping()));
-    }
-
-    /**
-     * Adapts the value provided by a {@link Function} with {@link #mapping()}
-     * as its input; if the returned value is {@code null}, {@link #fallback()}
-     * result is returned instead.
-     *
-     * @param source
-     *            the source of the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the result of the adaptation, or the fallback if the adaptation
-     *         input is missing
-     */
-    default V getOrDefault(Function<? super K, ?> source) {
-        final Object object = source.apply(mapping());
-        return (object != null) ? adaptation().apply(object) : fallback();
-    }
-
-    /**
-     * Adapts the object provided by a {@link Function} with {@link #mapping()}
-     * as its input.
-     *
-     * @param source
-     *            the source of the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the {@link Optional} with the result of the adaptation
-     */
-    default Optional<V> find(Function<? super K, ?> source) {
-        return adaptation().attempt(source.apply(mapping()));
-    }
-
-    /**
-     * Adapts the value provided by a {@link Function} with {@link #mapping()}
-     * as its input; if the returned value is {@code null}, {@link #fallback()}
-     * result is returned instead. The result is returned as an {@link Optional}
-     * for the case that the fallback value is also {@code null}, so that it may
-     * be processed in a {@code null}-safe way further.
-     *
-     * @param source
-     *            the source of the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the {@link Optional} containing the result
-     */
-    default Optional<V> findOptional(Function<? super K, ?> source) {
-        return Optional.ofNullable(getOrDefault(source));
-    }
-
-    /**
-     * Adapts the object provided by a {@link Function} with {@link #mapping()}
-     * as its input, or returns the {@link #fallback()} if the adaptation
-     * returns {@code null} for whatever reason.
-     *
-     * @param source
-     *            the source of the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the result of the adaptation or the fallback (which still may
-     *         return {@code null})
-     */
-    default V findOrDefault(Function<? super K, ?> source) {
-        return find(source).orElseGet(fallbackSupplier());
-    }
-
-    /**
-     * Returns the adaptation of the object provided by a {@link Function} with
-     * {@link #mapping()} as its input or the {@link #fallback()} result if the
-     * adaptation returns {@code null} for whatever reason.
-     *
-     * @param <X>
-     *            the type of the exception to throw if the method fails to
-     *            return a non-{@code null} result
-     * @param source
-     *            the source of the argument to adapt. It must not be
-     *            {@code null}.
-     * @param exception
-     *            the function that gets the key of the failing entry and shall
-     *            return the exception to throw. It must not be {@code null}.
-     *
-     * @return the result of the adaptation or the fallback
-     *
-     * @throws X
-     *             if both the adaptation and fallback returns {@code null}
-     */
-    default <X extends Throwable> V require(Function<? super K, ?> source, Function<? super K, ? extends X> exception) throws X {
-        final K key = mapping();
-        final Object object = source.apply(key);
-        final V result = (object != null) ? adaptation().apply(object) : fallback();
-
-        if (result == null) {
-            throw exception.apply(key);
-        }
-
-        return result;
-    }
-
-    /**
-     * Returns the adaptation of the object provided by a {@link Function} with
-     * {@link #mapping()} as its input or the {@link #fallback()} result if the
-     * adaptation returns {@code null} for whatever reason.
-     *
-     * @param source
-     *            the source of the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the result of the adaptation or the fallback
-     *
-     * @throws NoSuchElementException
-     *             if both the adaptation and fallback returns {@code null}
-     */
-    default V require(Function<? super K, ?> source) {
-        return require(source, o -> new NoSuchElementException(String.format("Missing item: %s", o)));
-    }
-
-    /**
-     * Passes {@link #mapping()} and the given value to the given consumer.
-     *
-     * @param consumer
-     *            the consumer to accept the mappable value and the given value.
-     *            It must not be {@code null}.
-     * @param value
-     *            the value to pass
-     */
-    default void put(BiConsumer<? super K, ? super V> consumer, V value) {
-        consumer.accept(mapping(), value);
-    }
-
-    /**
-     * Passes {@link #mapping()} and the adaptation of the given value to the
-     * given consumer.
-     *
-     * @param consumer
-     *            the consumer to accept the mappable value and the given value.
-     *            It must not be {@code null}.
-     * @param value
-     *            the value to adapt and pass
-     */
-    default void set(BiConsumer<? super K, ? super V> consumer, Object value) {
-        put(consumer, adaptation().apply(value));
-    }
-
-    // Map-based access methods
-
-    /**
-     * Adapts the object taken from a {@link Map} with {@link #mapping()} as the
-     * key.
-     *
-     * @param source
-     *            the map providing the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the result of the adaptation, or {@code null} if not possible
-     */
-    default V get(Map<?, ?> source) {
-        return adaptation().apply(source.get(mapping()));
-    }
-
-    /**
-     * Adapts the value taken from a {@link Map} with {@link #mapping()} as the
-     * key; if the returned value is {@code null}, {@link #fallback()} result is
-     * returned instead.
-     *
-     * @param source
-     *            the map providing the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the result of the adaptation, or the fallback if the adaptation
-     *         input is missing
-     */
-    default V getOrDefault(Map<?, ?> source) {
-        final Object object = source.get(mapping());
-        return (object != null) ? adaptation().apply(object) : fallback();
-    }
-
-    /**
-     * Adapts the object taken from a {@link Map} with {@link #mapping()} as the
-     * key.
-     *
-     * @param source
-     *            the map providing the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the {@link Optional} with the result of the adaptation
-     */
-    default Optional<V> find(Map<?, ?> source) {
-        return adaptation().attempt(source.get(mapping()));
-    }
-
-    /**
-     * Adapts the value taken from a {@link Map} with {@link #mapping()} as the
-     * key; if the returned value is {@code null}, {@link #fallback()} result is
-     * returned instead. The result is returned as an {@link Optional} for the
-     * case that the fallback value is also {@code null}, so that it may be
-     * processed in a {@code null}-safe way further.
-     *
-     * @param source
-     *            the source of the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the {@link Optional} containing the result
-     */
-    default Optional<V> findOptional(Map<?, ?> source) {
-        return Optional.ofNullable(getOrDefault(source));
-    }
-
-    /**
-     * Adapts the object taken from a {@link Map} with {@link #mapping()} as the
-     * key, or returns the {@link #fallback()} if the adaptation returns
-     * {@code null} for whatever reason.
-     *
-     * @param source
-     *            the map providing the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the result of the adaptation or the fallback (which still may
-     *         return {@code null})
-     */
-    default V findOrDefault(Map<?, ?> source) {
-        return find(source).orElseGet(fallbackSupplier());
-    }
-
-    /**
-     * Returns the adaptation of the object taken from a {@link Map} with
-     * {@link #mapping()} as the key or the {@link #fallback()} result if the
-     * adaptation returns {@code null} for whatever reason.
-     *
-     * @param <X>
-     *            the type of the exception to throw if the method fails to
-     *            return a non-{@code null} result
-     * @param source
-     *            the map providing the argument to adapt. It must not be
-     *            {@code null}.
-     * @param exception
-     *            the function that gets the key of the failing entry and shall
-     *            return the exception to throw. It must not be {@code null}.
-     *
-     * @return the result of the adaptation or the fallback
-     *
-     * @throws X
-     *             if both the adaptation and fallback returns {@code null}
-     */
-    default <X extends Throwable> V require(Map<?, ?> source, Function<? super K, ? extends X> exception) throws X {
-        final K key = mapping();
-        final Object object = source.get(key);
-        final V result = (object != null) ? adaptation().apply(object) : fallback();
-
-        if (result == null) {
-            throw exception.apply(key);
-        }
-
-        return result;
-    }
-
-    /**
-     * Returns the adaptation of the object taken from a {@link Map} with
-     * {@link #mapping()} as the key the {@link #fallback()} result if the
-     * adaptation returns {@code null} for whatever reason.
-     *
-     * @param source
-     *            the map providing the argument to adapt. It must not be
-     *            {@code null}.
-     *
-     * @return the result of the adaptation or the fallback
-     *
-     * @throws NoSuchElementException
-     *             if both the adaptation and fallback returns {@code null}
-     */
-    default V require(Map<?, ?> source) {
-        return require(source, o -> new NoSuchElementException(String.format("Missing item: %s", o)));
-    }
-
-    /**
-     * Puts the given value into the given {@link Map}, with {@link #mapping()}
-     * as the key for the value.
-     *
-     * @param consumer
-     *            the map accepting the value. It must not be {@code null}.
-     * @param value
-     *            the value to put
-     *
-     * @return the result of the {@link Map#put(Object, Object)} invocation
-     */
-    default Object put(Map<? super K, ? super V> consumer, V value) {
-        return consumer.put(mapping(), value);
-    }
-
-    /**
-     * Puts the adaptation of the given value to the given {@link Map}, with
-     * {@link #mapping()} as the key for the value.
-     *
-     * @param consumer
-     *            the consumer to accept the mappable value and the given value.
-     *            It must not be {@code null}.
-     * @param value
-     *            the value to adapt and pass
-     *
-     * @return the result of the {@link Map#put(Object, Object)} invocation
-     */
-    default Object set(Map<? super K, ? super V> consumer, Object value) {
-        return put(consumer, adaptation().apply(value));
-    }
 
     /**
      * Returns an instance that adapts anything to {@code null}, provides only
@@ -376,7 +74,184 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * @return an instance that reduces anything to {@code null}
      */
     @SuppressWarnings("unchecked")
-    static <K, V> Mappable<K, V> nulling() {
+    static <K, V> Mappable<K, V> nullified() {
         return (Mappable<K, V>) DefaultMappable.NULL;
+    }
+
+    /**
+     * Remap this instance to a specific key.
+     *
+     * <p>
+     * This method must return always equal values (and it is preferred to use
+     * immutable ones, or at least effectively immutable); the values therefore
+     * must have properly implemented and well-defined equality to be usable as
+     * keys.
+     *
+     * @return the key for this instance, which should never be {@code null}
+     */
+    K remap();
+
+    // Generic access methods
+
+    /**
+     * Returns an adapted value from the source.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the result of the adaptation, or {@code null} if not possible
+     */
+    default V get(Function<? super K, ?> source) {
+        return apply(source.apply(remap()));
+    }
+
+    /**
+     * Returns an adapted value from the source, or the default.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the result of the adaptation, or the default
+     */
+    default V use(Function<? super K, ?> source) {
+        return recover(source.apply(remap()));
+    }
+
+    /**
+     * Returns an adapted value from the source as an {@link Optional}.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return an adapted value from the source as an {@link Optional}
+     */
+    default Optional<V> find(Function<? super K, ?> source) {
+        return resolve(source.apply(remap()));
+    }
+
+    /**
+     * Returns a representation of an adapted value from the source.
+     * 
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the result of the adaptation
+     */
+    default AdaptationResult<V> yield(Function<? super K, ?> source) {
+        return adapt(source.apply(remap()));
+    }
+
+    /**
+     * Transfers the given value to the given consumer.
+     *
+     * @param consumer
+     *            the consumer to accept the {@link #remap()} result and the
+     *            given value. It must not be {@code null}.
+     * @param value
+     *            the value to transfer
+     */
+    default void put(BiConsumer<? super K, ? super V> consumer, V value) {
+        consumer.accept(remap(), value);
+    }
+
+    /**
+     * Transfers the adapted value to the given consumer.
+     *
+     * @param consumer
+     *            the consumer to accept the {@link #remap()} result and the
+     *            adapted value. It must not be {@code null}.
+     * @param value
+     *            the value to adapt and transfer
+     */
+    default void set(BiConsumer<? super K, ? super V> consumer, Object value) {
+        put(consumer, adaptation().apply(value));
+    }
+
+    // Map-based access methods
+
+    /**
+     * Returns an adapted value from the source.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the result of the adaptation, or {@code null} if not possible
+     */
+    default V get(Map<?, ?> source) {
+        return apply(source.get(remap()));
+    }
+
+    /**
+     * Returns an adapted value from the source, or the default.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the result of the adaptation, or the default
+     */
+    default V use(Map<?, ?> source) {
+        return recover(source.get(remap()));
+    }
+
+    /**
+     * Returns an adapted value from the source as an {@link Optional}.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return an adapted value from the source as an {@link Optional}
+     */
+    default Optional<V> find(Map<?, ?> source) {
+        return resolve(source.get(remap()));
+    }
+
+    /**
+     * Returns a representation of an adapted value from the source.
+     * 
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     *
+     * @return the result of the adaptation
+     */
+    default AdaptationResult<V> yield(Map<?, ?> source) {
+        return adapt(source.get(remap()));
+    }
+
+    /**
+     * Puts the given value to the given map.
+     *
+     * @param consumer
+     *            the map to accept the {@link #remap()} result and the given
+     *            value. It must not be {@code null}.
+     * @param value
+     *            the value to put
+     * 
+     * @return the result of {@link Map#put(Object, Object)}
+     */
+    default Object put(Map<? super K, ? super V> consumer, V value) {
+        return consumer.put(remap(), value);
+    }
+
+    /**
+     * Puts the adapted value to the given map.
+     *
+     * @param consumer
+     *            the map to accept the {@link #remap()} result and the adapted
+     *            value. It must not be {@code null}.
+     * @param value
+     *            the value to adapt and transfer
+     * 
+     * @return the result of the {@link Map#put(Object, Object)}
+     */
+    default Object set(Map<? super K, ? super V> consumer, Object value) {
+        return put(consumer, apply(value));
     }
 }

@@ -46,15 +46,9 @@ import java.util.function.Predicate;
  *
  * <ul>
  * <li>{@code apply(null)} must return {@code null}.</li>
- * <li>{@code apply(x)} must be always equal {@code apply(x)} (in the terms of
- * the {@code T::equals} method implementation) for any <i>x</i>.</li>
- * <li>{@code apply(x)} must be equal {@code apply(apply(x))} (in the terms of
- * the {@code T::equals} method implementation) for any <i>x</i>.</li>
+ * <li>{@code apply(x)} must be equal to {@code apply(x)}.</li>
+ * <li>{@code apply(x)} must be equal to {@code apply(apply(x))}.</li>
  * <li>All other methods must be consistent with {@link #apply(Object)}.</li>
- * <li>All methods should relay exceptions thrown by external code. Generally,
- * all methods should avoid throwing exceptions, unless an exception is meant
- * explicitly to be a possible outcome of the method ({@link #require(Object)}
- * is such a method).</li>
  * </ul>
  *
  * The sense of the conditions is that the adaptation must provide stable result
@@ -91,64 +85,6 @@ public interface Adaptation<T> {
      *         {@code null} or could not be adapted
      */
     T apply(Object o);
-
-    /**
-     * Adapts the given argument and throws an exception if the adaptation is
-     * not possible.
-     *
-     * <p>
-     * The difference of this method to {@link #apply(Object)} is that it never
-     * returns {@code null} if the argument is not {@code null} either. This is
-     * useful in situations where {@code null} means an absent value, which may
-     * be tolerated or was excluded beforehand.
-     *
-     * @param <X>
-     *            the type of the exception to throw if the adaptation fails
-     * @param o
-     *            the argument to adapt
-     * @param e
-     *            the function that is invoked when the adaptation fails to
-     *            provide the exception to be thrown; the function gets the
-     *            argument of this method
-     *
-     * @return the result of {@link #apply(Object)} that is not {@code null}, or
-     *         {@code null} if both the argument and the result are {@code null}
-     *
-     * @throws X
-     *             if adaptation of a non-{@code null} argument fails
-     */
-    default <X extends Throwable> T require(Object o, Function<Object, ? extends X> e) throws X {
-        final T result = apply(o);
-
-        if ((result == null) && (o == null)) { // Failed to adapt a non-null argument
-            throw e.apply(o);
-        }
-
-        return result;
-    }
-
-    /**
-     * Adapts the given argument and throws an exception if the adaptation is
-     * not possible.
-     *
-     * <p>
-     * The difference of this method to {@link #apply(Object)} is that it never
-     * returns {@code null} if the argument is not {@code null} either. This is
-     * useful in situations where {@code null} keeps the meaning of an absent
-     * value.
-     *
-     * @param o
-     *            the argument to adapt
-     *
-     * @return the result of {@link #apply(Object)} that is not {@code null}, or
-     *         {@code null} if both the argument and the result are {@code null}
-     *
-     * @throws AdaptationException
-     *             if adaptation of a non-{@code null} argument fails
-     */
-    default T require(Object o) {
-        return require(o, AdaptationException::new);
-    }
 
     /**
      * Attempts to adapt the given argument.

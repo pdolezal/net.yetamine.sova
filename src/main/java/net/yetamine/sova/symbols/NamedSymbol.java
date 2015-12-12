@@ -18,7 +18,7 @@ package net.yetamine.sova.symbols;
 
 import java.util.Map;
 
-import net.yetamine.sova.core.AdaptationStrategy;
+import net.yetamine.sova.core.AdaptationProvider;
 import net.yetamine.sova.core.DelegatingSymbol;
 import net.yetamine.sova.core.Downcasting;
 
@@ -40,11 +40,11 @@ public final class NamedSymbol<T> extends DelegatingSymbol<T> implements TaggedS
      *
      * @param instanceTag
      *            the tag of this instance. It must not be {@code null}.
-     * @param adaptation
-     *            the adaptation implementation. It must not be {@code null}.
+     * @param provider
+     *            the adaptation provider. It must not be {@code null}.
      */
-    public NamedSymbol(String instanceTag, AdaptationStrategy<T> adaptation) {
-        super(adaptation);
+    public NamedSymbol(String instanceTag, AdaptationProvider<T> provider) {
+        super(provider);
         tag = instanceTag;
     }
 

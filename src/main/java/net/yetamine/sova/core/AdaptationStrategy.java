@@ -16,10 +16,14 @@
 
 package net.yetamine.sova.core;
 
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Provides an adaptation strategy.
+ * Represents an adaptation strategy that provides the adaptation function and a
+ * fallback which can provide default values instead of some missing input. This
+ * interface can supply even the run-time type information when it is available.
  *
  * <p>
  * Subsequent invocations of all methods must provide equal results. Recommended
@@ -29,57 +33,120 @@ import java.util.function.Supplier;
  * @param <T>
  *            the type of resulting values
  */
-public interface AdaptationStrategy<T> {
+public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
 
     /**
-     * Provides the actual adaptation.
-     *
-     * @return the adaptation, never {@code null}
-     */
-    Adaptation<T> adaptation();
-
-    /**
-     * Provides the return type of the adaptation.
-     *
-     * @return the return type of the provided adaptation, or {@code null} if
-     *         the type is unknown or can't be provided
-     */
-    Class<T> rtti();
-
-    /**
-     * Returns the default value that shall be considered, if required or
-     * suitable, instead of trying to adapt a {@code null} value (when an
-     * adaptation must return {@code null} too).
-     *
+     * Returns an object for representing the result of the adaptation, which
+     * offers flexible means to consider the fallback value and apply other
+     * post-conditions.
+     * 
      * <p>
-     * There are often cases when a default value would be useful as an
-     * alternative to a missing input. However, returning a valid instance as a
-     * result for a {@code null} argument would cause difficulties in different
-     * cases. To avoid the problems, adaptations are defined intentionally as
-     * {@code null}-neutral, using {@code null} as the placeholder for absent
-     * input data, which usually plays well with collections. To support the
-     * cases where a default value might be useful, the default value can be
-     * provided by this interface.
-     *
-     * <p>
-     * This method is a convenient shortcut to {@code fallbackSupplier().get()}.
-     *
-     * @return the default value for the adaptation, or {@code null} if none is
-     *         defined
+     * The default implementation evaluates the adaptation of the argument right
+     * away and returns an object that captures the result and its context. This
+     * is the recommended implementation, which is more efficient in the typical
+     * use case where the result of this method is immediately processed, on the
+     * other hand, an implementation may supply an object that evaluates the
+     * adaptation on demand.
+     * 
+     * @param o
+     *            the argument for the adaptation
+     * 
+     * @return an object for retrieving the result of the adaptation
      */
-    default T fallback() {
-        return fallbackSupplier().get();
+    default AdaptationResult<T> adapt(Object o) {
+        return AdaptationResult.of(this, o, apply(o));
+    }
+
+    // Convenient application methods
+
+    /**
+     * Returns the default value if the argument is {@code null}, otherwise the
+     * argument.
+     * 
+     * @param o
+     *            the object to check
+     * @param f
+     *            the fallback to use. It must not be {@code null}.
+     * 
+     * @return the given object, or the default value
+     */
+    default T fallback(T o, Supplier<? extends T> f) {
+        return (o != null) ? o : f.get();
     }
 
     /**
-     * Provides the supplier of the default values.
-     *
-     * <p>
-     * This method must never return {@code null}, but it may return a supplier
-     * that returns (always) {@code null}. See the {@link #fallback()} method -
-     * this method must provide a consistent base for its implementation.
-     *
-     * @return the supplier of the default values {@code null}
+     * Returns the default value if the argument is {@code null}, otherwise the
+     * argument.
+     * 
+     * @param o
+     *            the object to check
+     * 
+     * @return the given object, or the default value
      */
-    Supplier<? extends T> fallbackSupplier();
+    default T fallback(T o) {
+        return fallback(o, fallback());
+    }
+
+    /**
+     * Returns the result of the adaptation of the given argument; this method
+     * is a shortcut for {@code adaptation().apply(o)}.
+     * 
+     * @param o
+     *            the argument to adapt
+     *
+     * @return the result of the adaptation, or {@code null} if the argument is
+     *         {@code null} or could not be adapted
+     */
+    default T apply(Object o) {
+        return adaptation().apply(o);
+    }
+
+    /**
+     * Returns the result of the adaptation of the given argument or the default
+     * value; this method is a shortcut for {@code fallback(apply(o))}.
+     * 
+     * @param o
+     *            the argument to adapt
+     *
+     * @return the result of the adaptation or the default value; {@code null}
+     *         is returned if neither the adaptation nor the fallback provided a
+     *         valid object
+     */
+    default T recover(Object o) {
+        return fallback(apply(o));
+    }
+
+    /**
+     * Returns an {@link Optional} instance representing the result of the
+     * adaptation of the given argument or the fallback; this method is a
+     * shortcut for {@code Optional.ofNullable(recover(o))}.
+     * 
+     * @param o
+     *            the argument to adapt
+     *
+     * @return the result of the adaptation or the fallback
+     */
+    default Optional<T> resolve(Object o) {
+        return Optional.ofNullable(recover(o));
+    }
+
+    // Interoperability support
+
+    /**
+     * Returns a {@link Function} instance invoking the {@link #adapt(Object)}
+     * method of this instance.
+     * 
+     * <p>
+     * This interface does not intentionally inherit from the {@link Function},
+     * although it is close enough, in order to prevent overloading with other
+     * methods, like {@link Function#andThen(Function)}, which do not fit very
+     * well into the purpose of this interface. Nevertheless, to support easy
+     * interoperability, this method provides a bridge that allows chaining
+     * like: {@code instance.function().andThen(CustomHandler::handle)}.
+     * 
+     * @return a function invoking {@link #adapt(Object)} of this instance
+     */
+    default Function<Object, AdaptationResult<T>> function() {
+        return this::adapt;
+    }
 }

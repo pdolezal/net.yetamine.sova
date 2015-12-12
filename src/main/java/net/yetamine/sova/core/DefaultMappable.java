@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 public final class DefaultMappable<K, V> implements Mappable<K, V> {
 
     /**
-     * Implementation of {@link Mappable#nulling()} result.
+     * Implementation of {@link Mappable#nullified()} result.
      *
      * <p>
      * The instance is stateless and accepts any instance as well as producing
@@ -41,9 +41,9 @@ public final class DefaultMappable<K, V> implements Mappable<K, V> {
     = new DefaultMappable<>(Downcasting.withFilter(Object.class, o -> false), () -> null);
 
     /** Implementation of the adaptation part. */
-    private final AdaptationStrategy<V> adaptation;
-    /** Supplier of the mappable values. */
-    private final Supplier<? extends K> mappable;
+    private final AdaptationProvider<V> provider;
+    /** Supplier of the remapping values. */
+    private final Supplier<? extends K> remapping;
 
     /**
      * Creates a new instance.
@@ -53,36 +53,36 @@ public final class DefaultMappable<K, V> implements Mappable<K, V> {
      * @param mapping
      *            the mappable supplier. It must not be {@code null}.
      */
-    public DefaultMappable(AdaptationStrategy<V> implementation, Supplier<? extends K> mapping) {
-        adaptation = Objects.requireNonNull(implementation);
-        mappable = Objects.requireNonNull(mapping);
+    public DefaultMappable(AdaptationProvider<V> implementation, Supplier<? extends K> mapping) {
+        provider = Objects.requireNonNull(implementation);
+        remapping = Objects.requireNonNull(mapping);
     }
 
     /**
-     * @see net.yetamine.sova.core.Mappable#mapping()
+     * @see net.yetamine.sova.core.Mappable#remap()
      */
-    public K mapping() {
-        return mappable.get();
+    public K remap() {
+        return remapping.get();
     }
 
     /**
      * @see net.yetamine.sova.core.AdaptationStrategy#adaptation()
      */
     public Adaptation<V> adaptation() {
-        return adaptation.adaptation();
+        return provider.adaptation();
+    }
+
+    /**
+     * @see net.yetamine.sova.core.AdaptationProvider#fallback()
+     */
+    public Supplier<? extends V> fallback() {
+        return provider.fallback();
     }
 
     /**
      * @see net.yetamine.sova.core.AdaptationStrategy#rtti()
      */
     public Class<V> rtti() {
-        return adaptation.rtti();
-    }
-
-    /**
-     * @see net.yetamine.sova.core.AdaptationStrategy#fallbackSupplier()
-     */
-    public Supplier<? extends V> fallbackSupplier() {
-        return adaptation.fallbackSupplier();
+        return provider.rtti();
     }
 }

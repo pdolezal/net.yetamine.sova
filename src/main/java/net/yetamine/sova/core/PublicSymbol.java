@@ -128,11 +128,12 @@ public interface PublicSymbol<I, V> extends Symbol<V> {
     I identifier();
 
     /**
-     * Returns the mapping implementation using the identifier instead of self.
+     * Returns the surrogate mapping implementation that uses the identifier
+     * instead of self.
      *
-     * @return the mapping implementation using the identifier instead of self
+     * @return the surrogate mapping implementation
      */
-    default Mappable<I, V> mappable() {
+    default Mappable<I, V> surrogate() {
         return new DefaultMappable<>(this, this::identifier);
     }
 }

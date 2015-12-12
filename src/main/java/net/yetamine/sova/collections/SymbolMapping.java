@@ -17,20 +17,21 @@
 package net.yetamine.sova.collections;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Function;
 
+import net.yetamine.sova.core.AdaptationResult;
 import net.yetamine.sova.core.Mappable;
 
 /**
  * An unmodifiable symbol-based view of a {@link Map}.
- *
+ * 
  * <p>
- * The interface provides a methods for looking up values using symbols as the
- * keys that mirror similar methods in the {@link Map} interface. It offers a
- * {@link Map} view on the content as well to improve the interoperability with
- * the Java Collections Framework.
+ * <i>Symbol-based</i> means here that the structure, unlike an ordinary map,
+ * uses surrogate objects, so called <i>symbols</i>, to stand for the actual
+ * keys of the stored mappings. Symbols serve for interpreting the values as
+ * well; the {@link Mappable} interface provides the base for symbols - the
+ * {@link Mappable#remap()} method supplies the actual keys for the mapping
+ * viewed via the {@link #map()} method.
  *
  * <p>
  * This structure does not support {@code null} values, although implementations
@@ -40,7 +41,7 @@ import net.yetamine.sova.core.Mappable;
  * <p>
  * Using {@code null} for the symbol arguments is prohibited (consistently with
  * prohibiting {@code null} values). When suitable or necessary, it is possible
- * to use {@link Mappable#nulling()} as a surrogate for a {@code null} symbol.
+ * to use {@link Mappable#nullified()} as a surrogate for a {@code null} symbol.
  *
  * <p>
  * The interface is designed as read-only; however, changing the content might
@@ -59,8 +60,7 @@ public interface SymbolMapping {
 
     /**
      * Compares the specified object with this instance for equality and returns
-     * {@code true} iff the object provides equal {@link SymbolMapping#map()}
-     * view too.
+     * {@code true} iff the object provides equal {@link #map()} view too.
      *
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -93,7 +93,7 @@ public interface SymbolMapping {
 
     /**
      * Returns the value associated with the given symbol, or {@code null} if no
-     * such value exists.
+     * mapping for the symbol exists.
      *
      * @param <T>
      *            the type of the result
@@ -102,15 +102,15 @@ public interface SymbolMapping {
      *            not be {@code null}.
      *
      * @return the value associated with the given symbol, or {@code null} if no
-     *         such value exists
+     *         mapping for the symbol exists
      */
     default <T> T get(Mappable<?, T> symbol) {
         return symbol.get(map());
     }
 
     /**
-     * Returns the value associated with the given symbol, or the fallback of
-     * the symbol if no such value exists.
+     * Returns the value associated with the given symbol, or the default value
+     * for the symbol if no mapping for the symbol exists.
      *
      * @param <T>
      *            the type of the result
@@ -118,16 +118,16 @@ public interface SymbolMapping {
      *            the symbol whose associated value is to be returned. It must
      *            not be {@code null}.
      *
-     * @return the value associated with the given symbol, or {@code null} if no
-     *         such value exists
+     * @return the value associated with the given symbol, or the default value
+     *         for the symbol if no mapping for the symbol exists
      */
-    default <T> T getOrDefault(Mappable<?, T> symbol) {
-        return symbol.getOrDefault(map());
+    default <T> T use(Mappable<?, T> symbol) {
+        return symbol.use(map());
     }
 
     /**
-     * Returns an {@link Optional} containing the value associated with the
-     * given symbol, or an empty container if no such value exists.
+     * Returns an {@link Optional} with the value associated with the given
+     * symbol, or an empty container if no mapping for the symbol exists.
      *
      * @param <T>
      *            the type of the result
@@ -136,15 +136,18 @@ public interface SymbolMapping {
      *            not be {@code null}.
      *
      * @return an {@link Optional} containing the value associated with the
-     *         given symbol, or an empty container if no such value exists
+     *         given symbol, or an empty container if no mapping for the symbol
+     *         exists
      */
     default <T> Optional<T> find(Mappable<?, T> symbol) {
         return symbol.find(map());
     }
 
     /**
-     * Returns an {@link Optional} containing the value associated with the
-     * given symbol or the fallback.
+     * Returns an {@link AdaptationResult} describing the attempt to adapt the
+     * value associated to the given symbol with the symbol; the result allows
+     * querying the value or the fallback as well as other details of the
+     * operation.
      *
      * @param <T>
      *            the type of the result
@@ -152,73 +155,10 @@ public interface SymbolMapping {
      *            the symbol whose associated value is to be returned. It must
      *            not be {@code null}.
      *
-     * @return the {@link Optional} containing the result
+     * @return an {@link AdaptationResult} describing the attempt to adapt the
+     *         value associated to the given symbol with the symbol
      */
-    default <T> Optional<T> findOptional(Mappable<?, T> symbol) {
-        return symbol.findOptional(map());
-    }
-
-    /**
-     * Returns the value associated with the given symbol, or the fallback of
-     * the symbol if the value could be adapted.
-     *
-     * @param <T>
-     *            the type of the result
-     * @param symbol
-     *            the symbol whose associated value is to be returned. It must
-     *            not be {@code null}.
-     *
-     * @return the value associated with the given symbol, or {@code null} if
-     *         the value could not be adapted
-     */
-    default <T> T findOrDefault(Mappable<?, T> symbol) {
-        return symbol.findOrDefault(map());
-    }
-
-    /**
-     * Returns the value associated with the given symbol or the fallback of the
-     * symbol result if the if the value could not be adapted.
-     *
-     * @param <K>
-     *            the type of the key
-     * @param <T>
-     *            the type of the result
-     * @param <X>
-     *            the type of the exception to throw if the method fails to
-     *            return a non-{@code null} result
-     * @param symbol
-     *            the symbol whose associated value is to be returned. It must
-     *            not be {@code null}.
-     * @param exception
-     *            the function that gets the key of the failing entry and shall
-     *            return the exception to throw. It must not be {@code null}.
-     *
-     * @return the value associated with the given symbol or the fallback
-     *
-     * @throws X
-     *             if both the no value is associated with the symbol and the
-     *             fallback returns {@code null}
-     */
-    default <K, T, X extends Throwable> T require(Mappable<K, T> symbol, Function<? super K, ? extends X> exception) throws X {
-        return symbol.require(map(), exception);
-    }
-
-    /**
-     * Returns the value associated with the given symbol or the fallback of the
-     * symbol result if the if the value could not be adapted.
-     *
-     * @param <T>
-     *            the type of the result
-     * @param symbol
-     *            the symbol whose associated value is to be returned. It must
-     *            not be {@code null}.
-     *
-     * @return the value associated with the given symbol or the fallback
-     *
-     * @throws NoSuchElementException
-     *             if both the adaptation and fallback returns {@code null}
-     */
-    default <T> T require(Mappable<?, T> symbol) {
-        return symbol.require(map());
+    default <T> AdaptationResult<T> yield(Mappable<?, T> symbol) {
+        return symbol.yield(map());
     }
 }

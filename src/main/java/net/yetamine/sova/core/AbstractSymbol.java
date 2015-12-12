@@ -22,15 +22,16 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * An abstract base class for implementing the {@link Symbol} interface.
  *
  * <p>
- * This class makes the inherited method implementations final in order to
- * increase the robustness of the implementation, which makes it a good base for
- * other extensible classes. Still, since {@link Symbol} is an interface, making
- * mixins or cross-hierarchy extensions is possible.
+ * This class makes most of the inherited method implementations final in order
+ * to increase the robustness of the implementation, which makes it a good base
+ * for other extensible classes. Still, since {@link Symbol} is an interface,
+ * making mixins or cross-hierarchy extensions is possible.
  *
  * @param <T>
  *            the type of resulting values
@@ -64,75 +65,80 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.core.AdaptationStrategy#fallback()
+     * @see net.yetamine.sova.core.AdaptationStrategy#apply(java.lang.Object)
      */
-    public final T fallback() {
-        return Symbol.super.fallback();
+    public final T apply(Object o) {
+        return Symbol.super.apply(o);
     }
 
-    // Mapping support
+    /**
+     * @see net.yetamine.sova.core.AdaptationStrategy#recover(java.lang.Object)
+     */
+    public final T recover(Object o) {
+        return Symbol.super.recover(o);
+    }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#mapping()
+     * @see net.yetamine.sova.core.AdaptationStrategy#resolve(java.lang.Object)
      */
-    public Symbol<T> mapping() {
-        return Symbol.super.mapping();
+    public final Optional<T> resolve(Object o) {
+        return Symbol.super.resolve(o);
+    }
+
+    /**
+     * @see net.yetamine.sova.core.AdaptationStrategy#fallback(java.lang.Object,
+     *      java.util.function.Supplier)
+     */
+    public final T fallback(T o, Supplier<? extends T> f) {
+        return Symbol.super.fallback(o, f);
+    }
+
+    /**
+     * @see net.yetamine.sova.core.AdaptationStrategy#fallback(java.lang.Object)
+     */
+    public final T fallback(T o) {
+        return Symbol.super.fallback(o);
+    }
+
+    /**
+     * @see net.yetamine.sova.core.AdaptationStrategy#function()
+     */
+    public final Function<Object, AdaptationResult<T>> function() {
+        return Symbol.super.function();
     }
 
     // Generic access methods
 
     /**
-     * @see net.yetamine.sova.core.Symbol#get(java.util.function.Function)
+     * @see net.yetamine.sova.core.Mappable#get(java.util.function.Function)
      */
     public final T get(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.get(source);
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#getOrDefault(java.util.function.Function)
+     * @see net.yetamine.sova.core.Mappable#use(java.util.function.Function)
      */
-    public final T getOrDefault(Function<? super Symbol<T>, ?> source) {
-        return Symbol.super.getOrDefault(source);
+    public final T use(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.use(source);
     }
 
     /**
-     * @see net.yetamine.sova.core.Mappable#findOptional(java.util.function.Function)
-     */
-    public final Optional<T> findOptional(Function<? super Symbol<T>, ?> source) {
-        return Symbol.super.findOptional(source);
-    }
-
-    /**
-     * @see net.yetamine.sova.core.Symbol#findOrDefault(java.util.function.Function)
-     */
-    public final T findOrDefault(Function<? super Symbol<T>, ?> source) {
-        return Symbol.super.findOrDefault(source);
-    }
-
-    /**
-     * @see net.yetamine.sova.core.Mappable#require(java.util.function.Function,
-     *      java.util.function.Function)
-     */
-    public final <X extends Throwable> T require(Function<? super Symbol<T>, ?> source, Function<? super Symbol<T>, ? extends X> exception) throws X {
-        return Symbol.super.require(source, exception);
-    }
-
-    /**
-     * @see net.yetamine.sova.core.Mappable#require(java.util.function.Function)
-     */
-    public final T require(Function<? super Symbol<T>, ?> source) {
-        return Symbol.super.require(source);
-    }
-
-    /**
-     * @see net.yetamine.sova.core.Symbol#find(java.util.function.Function)
+     * @see net.yetamine.sova.core.Mappable#find(java.util.function.Function)
      */
     public final Optional<T> find(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.find(source);
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#put(java.util.function.BiConsumer,
+     * @see net.yetamine.sova.core.Mappable#yield(java.util.function.Function)
+     */
+    public final AdaptationResult<T> yield(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.yield(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.core.Mappable#put(java.util.function.BiConsumer,
      *      java.lang.Object)
      */
     public final void put(BiConsumer<? super Symbol<T>, ? super T> consumer, T value) {
@@ -140,7 +146,7 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#set(java.util.function.BiConsumer,
+     * @see net.yetamine.sova.core.Mappable#set(java.util.function.BiConsumer,
      *      java.lang.Object)
      */
     public final void set(BiConsumer<? super Symbol<T>, ? super T> consumer, Object value) {
@@ -150,61 +156,48 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     // Map-based access methods
 
     /**
-     * @see net.yetamine.sova.core.Symbol#get(java.util.Map)
+     * @see net.yetamine.sova.core.Mappable#get(java.util.Map)
      */
     public final T get(Map<?, ?> source) {
         return Symbol.super.get(source);
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#getOrDefault(java.util.Map)
+     * @see net.yetamine.sova.core.Mappable#use(java.util.Map)
      */
-    public final T getOrDefault(Map<?, ?> source) {
-        return Symbol.super.getOrDefault(source);
+    public final T use(Map<?, ?> source) {
+        return Symbol.super.use(source);
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#findOrDefault(java.util.Map)
-     */
-    public final T findOrDefault(Map<?, ?> source) {
-        return Symbol.super.findOrDefault(source);
-    }
-
-    /**
-     * @see net.yetamine.sova.core.Mappable#require(java.util.Map,
-     *      java.util.function.Function)
-     */
-    public final <X extends Throwable> T require(Map<?, ?> source, Function<? super Symbol<T>, ? extends X> exception) throws X {
-        return Symbol.super.require(source, exception);
-    }
-
-    /**
-     * @see net.yetamine.sova.core.Mappable#require(java.util.Map)
-     */
-    public final T require(Map<?, ?> source) {
-        return Symbol.super.require(source);
-    }
-
-    /**
-     * @see net.yetamine.sova.core.Symbol#find(java.util.Map)
+     * @see net.yetamine.sova.core.Mappable#find(java.util.Map)
      */
     public final Optional<T> find(Map<?, ?> source) {
         return Symbol.super.find(source);
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#put(java.util.Map, java.lang.Object)
+     * @see net.yetamine.sova.core.Mappable#yield(java.util.Map)
+     */
+    public final AdaptationResult<T> yield(Map<?, ?> source) {
+        return Symbol.super.yield(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.core.Mappable#put(java.util.Map, java.lang.Object)
      */
     public final Object put(Map<? super Symbol<T>, ? super T> consumer, T value) {
         return Symbol.super.put(consumer, value);
     }
 
     /**
-     * @see net.yetamine.sova.core.Symbol#set(java.util.Map, java.lang.Object)
+     * @see net.yetamine.sova.core.Mappable#set(java.util.Map, java.lang.Object)
      */
     public final Object set(Map<? super Symbol<T>, ? super T> consumer, Object value) {
         return Symbol.super.set(consumer, value);
     }
+
+    // Other stuff
 
     /**
      * Adds implementation-specific features to the set of results provided by

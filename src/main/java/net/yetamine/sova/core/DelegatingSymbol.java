@@ -19,10 +19,10 @@ package net.yetamine.sova.core;
 import java.util.function.Supplier;
 
 /**
- * An abstract base class that uses another {@link AdaptationStrategy}.
+ * An abstract base class that uses another {@link AdaptationProvider}.
  *
  * <p>
- * This class delegates to the operations given by an {@link AdaptationStrategy}
+ * This class delegates to the operations given by an {@link AdaptationProvider}
  * in order to provide the same behavior, but rather than delegating directly to
  * the other instance, it embodies those operations to reduce the overhead.
  *
@@ -33,41 +33,43 @@ public abstract class DelegatingSymbol<T> extends AbstractSymbol<T> {
 
     /** Actual adaptation implementation. */
     private final Adaptation<T> adaptation;
-    /** Actual supplier of the default values. */
-    private final Supplier<? extends T> fallbackSupplier;
+    /** Actual supplier of default values. */
+    private final Supplier<? extends T> fallback;
     /** Run-time type information for the values. */
     private final Class<T> rtti;
 
     /**
      * Prepares a new instance.
      *
-     * @param strategy
-     *            the adaptation strategy to use. It must not be {@code null}.
+     * @param provider
+     *            the adaptation provider to use. It must not be {@code null}.
      */
-    protected DelegatingSymbol(AdaptationStrategy<T> strategy) {
-        fallbackSupplier = strategy.fallbackSupplier();
-        adaptation = strategy.adaptation();
-        rtti = strategy.rtti();
-        // Imposed by the contract!
+    protected DelegatingSymbol(AdaptationProvider<T> provider) {
+        adaptation = provider.adaptation();
+        fallback = provider.fallback();
+        rtti = provider.rtti();
+        assert (fallback != null);
         assert (adaptation != null);
-        assert (fallbackSupplier != null);
     }
 
     /**
-     * @see net.yetamine.sova.core.AdaptationStrategy#adaptation()
+     * @see net.yetamine.sova.core.AdaptationProvider#adaptation()
      */
     public final Adaptation<T> adaptation() {
         return adaptation;
     }
 
     /**
-     * @see net.yetamine.sova.core.AdaptationStrategy#rtti()
+     * @see net.yetamine.sova.core.AdaptationProvider#fallback()
+     */
+    public final Supplier<? extends T> fallback() {
+        return fallback;
+    }
+
+    /**
+     * @see net.yetamine.sova.core.AdaptationProvider#rtti()
      */
     public final Class<T> rtti() {
         return rtti;
-    }
-
-    public final Supplier<? extends T> fallbackSupplier() {
-        return fallbackSupplier;
     }
 }

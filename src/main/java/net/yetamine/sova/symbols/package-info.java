@@ -19,3 +19,4 @@
  * a good base for creating various usage-specific symbols.
  */
 package net.yetamine.sova.symbols;
+

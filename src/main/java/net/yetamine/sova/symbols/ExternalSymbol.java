@@ -19,7 +19,7 @@ package net.yetamine.sova.symbols;
 import java.util.Map;
 import java.util.Objects;
 
-import net.yetamine.sova.core.AdaptationStrategy;
+import net.yetamine.sova.core.AdaptationProvider;
 import net.yetamine.sova.core.DelegatingSymbol;
 import net.yetamine.sova.core.Downcasting;
 import net.yetamine.sova.core.Mappable;
@@ -56,19 +56,19 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
 
     /** Identifier of this instance. */
     private final I identifier;
-    /** Cached {@link #mappable()}. */
-    private Mappable<I, V> mapping;
+    /** Cached {@link #surrogate()}. */
+    private Mappable<I, V> surrogate;
 
     /**
      * Creates a new instance.
      *
      * @param instanceIdentifier
      *            the identifier of this instance. It must not be {@code null}.
-     * @param adaptation
-     *            the adaptation implementation. It must not be {@code null}.
+     * @param provider
+     *            the adaptation provider. It must not be {@code null}.
      */
-    public ExternalSymbol(I instanceIdentifier, AdaptationStrategy<V> adaptation) {
-        super(adaptation);
+    public ExternalSymbol(I instanceIdentifier, AdaptationProvider<V> provider) {
+        super(provider);
         identifier = Objects.requireNonNull(instanceIdentifier);
     }
 
@@ -110,19 +110,19 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
     }
 
     /**
-     * @see net.yetamine.sova.core.PublicSymbol#mappable()
+     * @see net.yetamine.sova.core.PublicSymbol#surrogate()
      */
-    public final Mappable<I, V> mappable() {
+    public final Mappable<I, V> surrogate() {
         // Using caching technique that uses out-of-thin air thread safety;
         // this technique is alright here, because the instances are always
         // behaving in the same way, therefore they are interchangeable
-        Mappable<I, V> result = mapping;
+        Mappable<I, V> result = surrogate;
         if (result != null) {
             return result;
         }
 
-        result = PublicSymbol.super.mappable();
-        mapping = result;
+        result = PublicSymbol.super.surrogate();
+        surrogate = result;
         return result;
     }
 

@@ -32,3 +32,4 @@
  * a collection.
  */
 package net.yetamine.sova.collections;
+
