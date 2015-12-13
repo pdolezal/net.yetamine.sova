@@ -18,9 +18,8 @@ package net.yetamine.sova.symbols;
 
 import java.util.Map;
 
-import net.yetamine.sova.core.AdaptationProvider;
-import net.yetamine.sova.core.DelegatingSymbol;
-import net.yetamine.sova.core.Downcasting;
+import net.yetamine.sova.adaptation.AdaptationProvider;
+import net.yetamine.sova.adaptation.Downcasting;
 
 /**
  * A symbol implementation that intentionally uses instance identity, therefore
@@ -80,7 +79,7 @@ public class InternalSymbol<T> extends DelegatingSymbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.core.AbstractSymbol#introspect(java.util.Map)
+     * @see net.yetamine.sova.symbols.AbstractSymbol#introspect(java.util.Map)
      */
     @Override
     protected void introspect(Map<String, Object> result) {

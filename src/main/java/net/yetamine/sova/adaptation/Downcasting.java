@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.core;
+package net.yetamine.sova.adaptation;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -71,21 +71,21 @@ public final class Downcasting<T> implements AdaptationProvider<T> {
     }
 
     /**
-     * @see net.yetamine.sova.core.AdaptationStrategy#adaptation()
+     * @see net.yetamine.sova.adaptation.AdaptationStrategy#adaptation()
      */
     public Adaptation<T> adaptation() {
         return adaptation;
     }
 
     /**
-     * @see net.yetamine.sova.core.AdaptationProvider#fallback()
+     * @see net.yetamine.sova.adaptation.AdaptationProvider#fallback()
      */
     public Supplier<? extends T> fallback() {
         return fallback;
     }
 
     /**
-     * @see net.yetamine.sova.core.AdaptationStrategy#rtti()
+     * @see net.yetamine.sova.adaptation.AdaptationStrategy#rtti()
      */
     public Class<T> rtti() {
         return rtti;

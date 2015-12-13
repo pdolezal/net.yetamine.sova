@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.core;
+package net.yetamine.sova.symbols;
+
+import net.yetamine.sova.adaptation.Mappable;
 
 /**
  * An extension of the {@link Mappable} interface that enables using self as the
  * key directly.
- * 
+ *
  * <p>
  * In order to support this essential requirement and feature of this interface,
  * all implementations have to provide a well-defined equality support and keep
@@ -32,15 +34,15 @@ public interface Symbol<T> extends Mappable<Symbol<T>, T> {
 
     /**
      * Returns this instance.
-     * 
+     *
      * <p>
      * This method may be overridden in order to change its return type, but it
      * must always return {@code this} even then. Overriding, however, can't be
      * recommended much as it may impose some overhead and is rarely necessary.
-     * 
+     *
      * @return {@code this}
-     * 
-     * @see net.yetamine.sova.core.Mappable#remap()
+     *
+     * @see net.yetamine.sova.adaptation.Mappable#remap()
      */
     default Symbol<T> remap() {
         return this;

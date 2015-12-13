@@ -16,8 +16,6 @@
 
 package net.yetamine.sova.symbols;
 
-import net.yetamine.sova.core.Symbol;
-
 /**
  * An extension of the {@link Symbol} interface that allows attaching a tag that
  * helps manipulations with the symbol for the purpose of presentation, logging,

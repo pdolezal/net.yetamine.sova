@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.core;
+package net.yetamine.sova.symbols;
 
 import java.util.function.Supplier;
+
+import net.yetamine.sova.adaptation.Adaptation;
+import net.yetamine.sova.adaptation.AdaptationProvider;
 
 /**
  * An abstract base class that uses another {@link AdaptationProvider}.
@@ -53,21 +56,21 @@ public abstract class DelegatingSymbol<T> extends AbstractSymbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.core.AdaptationProvider#adaptation()
+     * @see net.yetamine.sova.adaptation.AdaptationProvider#adaptation()
      */
     public final Adaptation<T> adaptation() {
         return adaptation;
     }
 
     /**
-     * @see net.yetamine.sova.core.AdaptationProvider#fallback()
+     * @see net.yetamine.sova.adaptation.AdaptationProvider#fallback()
      */
     public final Supplier<? extends T> fallback() {
         return fallback;
     }
 
     /**
-     * @see net.yetamine.sova.core.AdaptationProvider#rtti()
+     * @see net.yetamine.sova.adaptation.AdaptationProvider#rtti()
      */
     public final Class<T> rtti() {
         return rtti;

@@ -15,8 +15,7 @@
  */
 
 /**
- * Provides common symbol implementations which are ready to use and serve as
- * a good base for creating various usage-specific symbols.
+ * Defines the symbol interface and base types for common symbol implementations
+ * which are ready to use.
  */
 package net.yetamine.sova.symbols;
-

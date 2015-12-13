@@ -126,4 +126,3 @@
  * could provide even better support for more and more generic symbol types.
  */
 package net.yetamine.sova;
-

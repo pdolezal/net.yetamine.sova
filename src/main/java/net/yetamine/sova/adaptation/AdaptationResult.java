@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.core;
+package net.yetamine.sova.adaptation;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -218,21 +218,21 @@ public interface AdaptationResult<T> extends Supplier<T> {
         return new AdaptationResult<T>() {
 
             /**
-             * @see net.yetamine.sova.core.AdaptationResult#operation()
+             * @see net.yetamine.sova.adaptation.AdaptationResult#operation()
              */
             public AdaptationStrategy<T> operation() {
                 return operation;
             }
 
             /**
-             * @see net.yetamine.sova.core.AdaptationResult#argument()
+             * @see net.yetamine.sova.adaptation.AdaptationResult#argument()
              */
             public Object argument() {
                 return argument;
             }
 
             /**
-             * @see net.yetamine.sova.core.AdaptationResult#get()
+             * @see net.yetamine.sova.adaptation.AdaptationResult#get()
              */
             public T get() {
                 return value;

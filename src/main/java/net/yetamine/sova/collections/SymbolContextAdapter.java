@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import net.yetamine.sova.core.Adaptation;
-import net.yetamine.sova.core.Mappable;
+import net.yetamine.sova.adaptation.Adaptation;
+import net.yetamine.sova.adaptation.Mappable;
 
 /**
  * A skeletal implementation of an adapter for {@link Map}.
@@ -65,7 +65,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#discard(net.yetamine.sova.core.Mappable)
+     * @see net.yetamine.sova.collections.SymbolContext#discard(net.yetamine.sova.adaptation.Mappable)
      */
     public SymbolContext discard(Mappable<?, ?> symbol) {
         storage().remove(symbol.remap());
@@ -73,7 +73,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#set(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#set(net.yetamine.sova.adaptation.Mappable,
      *      java.lang.Object)
      */
     public <T> SymbolContext set(Mappable<?, T> symbol, T value) {
@@ -83,14 +83,14 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.core.Mappable)
+     * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.adaptation.Mappable)
      */
     public <T> T remove(Mappable<?, T> symbol) {
         return symbol.apply(storage().remove(symbol.remap()));
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.adaptation.Mappable,
      *      java.lang.Object)
      */
     public boolean remove(Mappable<?, ?> symbol, Object value) {
@@ -98,7 +98,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#put(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#put(net.yetamine.sova.adaptation.Mappable,
      *      java.lang.Object)
      */
     public <T> T put(Mappable<?, T> symbol, T value) {
@@ -107,7 +107,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#putIfAbsent(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#putIfAbsent(net.yetamine.sova.adaptation.Mappable,
      *      java.lang.Object)
      */
     public <T> T putIfAbsent(Mappable<?, T> symbol, T value) {
@@ -124,7 +124,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#replace(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#replace(net.yetamine.sova.adaptation.Mappable,
      *      java.lang.Object, java.lang.Object)
      */
     public <T> boolean replace(Mappable<?, T> symbol, Object oldValue, T newValue) {
@@ -132,7 +132,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#replace(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#replace(net.yetamine.sova.adaptation.Mappable,
      *      java.lang.Object)
      */
     public <T> T replace(Mappable<?, T> symbol, T value) {
@@ -141,7 +141,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#merge(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#merge(net.yetamine.sova.adaptation.Mappable,
      *      java.lang.Object, java.util.function.BiFunction)
      */
     public <T> T merge(Mappable<?, T> symbol, T value, BiFunction<? super T, ? super T, ? extends T> remapping) {
@@ -157,7 +157,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#compute(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#compute(net.yetamine.sova.adaptation.Mappable,
      *      java.util.function.BiFunction)
      */
     public <K, T> T compute(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remappingFunction) {
@@ -173,7 +173,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#computeIfAbsent(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#computeIfAbsent(net.yetamine.sova.adaptation.Mappable,
      *      java.util.function.Function)
      */
     public <K, T> T computeIfAbsent(Mappable<K, T> symbol, Function<? super K, ? extends T> mappingFunction) {
@@ -181,7 +181,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolContext#computeIfPresent(net.yetamine.sova.core.Mappable,
+     * @see net.yetamine.sova.collections.SymbolContext#computeIfPresent(net.yetamine.sova.adaptation.Mappable,
      *      java.util.function.BiFunction)
      */
     public <K, T> T computeIfPresent(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remapping) {

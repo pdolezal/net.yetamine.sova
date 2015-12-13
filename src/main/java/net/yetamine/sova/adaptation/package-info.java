@@ -15,6 +15,6 @@
  */
 
 /**
- * Defines the core types for implementing symbols and handling them.
+ * Defines the core suport for object adaption.
  */
-package net.yetamine.sova.core;
+package net.yetamine.sova.adaptation;

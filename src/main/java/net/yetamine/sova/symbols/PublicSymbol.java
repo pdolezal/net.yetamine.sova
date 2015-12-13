@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.core;
+package net.yetamine.sova.symbols;
+
+import net.yetamine.sova.adaptation.DefaultMappable;
+import net.yetamine.sova.adaptation.Mappable;
 
 /**
  * An extension of the {@link Symbol} interface that links every instance to a
@@ -56,7 +59,7 @@ public interface PublicSymbol<I, V> extends Symbol<V> {
      *
      * @return {@code true} if the object is equal to this instance
      *
-     * @see net.yetamine.sova.core.Symbol#equals(java.lang.Object)
+     * @see net.yetamine.sova.symbols.Symbol#equals(java.lang.Object)
      */
     boolean equals(Object o);
 

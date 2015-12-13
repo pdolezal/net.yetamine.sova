@@ -19,11 +19,9 @@ package net.yetamine.sova.symbols;
 import java.util.Map;
 import java.util.Objects;
 
-import net.yetamine.sova.core.AdaptationProvider;
-import net.yetamine.sova.core.DelegatingSymbol;
-import net.yetamine.sova.core.Downcasting;
-import net.yetamine.sova.core.Mappable;
-import net.yetamine.sova.core.PublicSymbol;
+import net.yetamine.sova.adaptation.AdaptationProvider;
+import net.yetamine.sova.adaptation.Downcasting;
+import net.yetamine.sova.adaptation.Mappable;
 
 /**
  * A symbol implementation which is coupled with a published identifier that is
@@ -103,14 +101,14 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
     }
 
     /**
-     * @see net.yetamine.sova.core.PublicSymbol#identifier()
+     * @see net.yetamine.sova.symbols.PublicSymbol#identifier()
      */
     public final I identifier() {
         return identifier;
     }
 
     /**
-     * @see net.yetamine.sova.core.PublicSymbol#surrogate()
+     * @see net.yetamine.sova.symbols.PublicSymbol#surrogate()
      */
     public final Mappable<I, V> surrogate() {
         // Using caching technique that uses out-of-thin air thread safety;
@@ -127,7 +125,7 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
     }
 
     /**
-     * @see net.yetamine.sova.core.AbstractSymbol#introspect(java.util.Map)
+     * @see net.yetamine.sova.symbols.AbstractSymbol#introspect(java.util.Map)
      */
     @Override
     protected void introspect(Map<String, Object> result) {

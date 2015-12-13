@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import net.yetamine.sova.core.AdaptationException;
-import net.yetamine.sova.core.Mappable;
+import net.yetamine.sova.adaptation.AdaptationException;
+import net.yetamine.sova.adaptation.Mappable;
 
 /**
  * A mutable symbol-based view of a {@link Map}.

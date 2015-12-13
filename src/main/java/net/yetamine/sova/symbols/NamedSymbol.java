@@ -18,9 +18,8 @@ package net.yetamine.sova.symbols;
 
 import java.util.Map;
 
-import net.yetamine.sova.core.AdaptationProvider;
-import net.yetamine.sova.core.DelegatingSymbol;
-import net.yetamine.sova.core.Downcasting;
+import net.yetamine.sova.adaptation.AdaptationProvider;
+import net.yetamine.sova.adaptation.Downcasting;
 
 /**
  * An implementation of {@link TaggedSymbol} that declares a {@link String} tag.
@@ -102,7 +101,7 @@ public final class NamedSymbol<T> extends DelegatingSymbol<T> implements TaggedS
     }
 
     /**
-     * @see net.yetamine.sova.core.AbstractSymbol#introspect(java.util.Map)
+     * @see net.yetamine.sova.symbols.AbstractSymbol#introspect(java.util.Map)
      */
     @Override
     protected void introspect(Map<String, Object> result) {

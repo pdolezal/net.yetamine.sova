@@ -19,12 +19,12 @@ package net.yetamine.sova.collections;
 import java.util.Map;
 import java.util.Optional;
 
-import net.yetamine.sova.core.AdaptationResult;
-import net.yetamine.sova.core.Mappable;
+import net.yetamine.sova.adaptation.AdaptationResult;
+import net.yetamine.sova.adaptation.Mappable;
 
 /**
  * An unmodifiable symbol-based view of a {@link Map}.
- * 
+ *
  * <p>
  * <i>Symbol-based</i> means here that the structure, unlike an ordinary map,
  * uses surrogate objects, so called <i>symbols</i>, to stand for the actual

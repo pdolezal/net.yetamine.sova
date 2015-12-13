@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.core;
+package net.yetamine.sova.adaptation;
 
 import java.util.Objects;
 import java.util.Optional;

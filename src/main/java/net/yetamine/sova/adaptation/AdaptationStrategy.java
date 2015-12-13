@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.core;
+package net.yetamine.sova.adaptation;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -39,7 +39,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      * Returns an object for representing the result of the adaptation, which
      * offers flexible means to consider the fallback value and apply other
      * post-conditions.
-     * 
+     *
      * <p>
      * The default implementation evaluates the adaptation of the argument right
      * away and returns an object that captures the result and its context. This
@@ -47,10 +47,10 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      * use case where the result of this method is immediately processed, on the
      * other hand, an implementation may supply an object that evaluates the
      * adaptation on demand.
-     * 
+     *
      * @param o
      *            the argument for the adaptation
-     * 
+     *
      * @return an object for retrieving the result of the adaptation
      */
     default AdaptationResult<T> adapt(Object o) {
@@ -62,12 +62,12 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
     /**
      * Returns the default value if the argument is {@code null}, otherwise the
      * argument.
-     * 
+     *
      * @param o
      *            the object to check
      * @param f
      *            the fallback to use. It must not be {@code null}.
-     * 
+     *
      * @return the given object, or the default value
      */
     default T fallback(T o, Supplier<? extends T> f) {
@@ -77,10 +77,10 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
     /**
      * Returns the default value if the argument is {@code null}, otherwise the
      * argument.
-     * 
+     *
      * @param o
      *            the object to check
-     * 
+     *
      * @return the given object, or the default value
      */
     default T fallback(T o) {
@@ -90,7 +90,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
     /**
      * Returns the result of the adaptation of the given argument; this method
      * is a shortcut for {@code adaptation().apply(o)}.
-     * 
+     *
      * @param o
      *            the argument to adapt
      *
@@ -104,7 +104,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
     /**
      * Returns the result of the adaptation of the given argument or the default
      * value; this method is a shortcut for {@code fallback(apply(o))}.
-     * 
+     *
      * @param o
      *            the argument to adapt
      *
@@ -120,7 +120,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      * Returns an {@link Optional} instance representing the result of the
      * adaptation of the given argument or the fallback; this method is a
      * shortcut for {@code Optional.ofNullable(recover(o))}.
-     * 
+     *
      * @param o
      *            the argument to adapt
      *
@@ -135,7 +135,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
     /**
      * Returns a {@link Function} instance invoking the {@link #adapt(Object)}
      * method of this instance.
-     * 
+     *
      * <p>
      * This interface does not intentionally inherit from the {@link Function},
      * although it is close enough, in order to prevent overloading with other
@@ -143,7 +143,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      * well into the purpose of this interface. Nevertheless, to support easy
      * interoperability, this method provides a bridge that allows chaining
      * like: {@code instance.function().andThen(CustomHandler::handle)}.
-     * 
+     *
      * @return a function invoking {@link #adapt(Object)} of this instance
      */
     default Function<Object, AdaptationResult<T>> function() {

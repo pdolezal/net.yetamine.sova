@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.core;
+package net.yetamine.sova.adaptation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +25,7 @@ import java.util.function.Function;
  * An adaptation strategy that can remap self to a different type and/or object.
  * This capability allows to use instances of this interface as adaptive keys in
  * various map-like structures and with various mapping strategies.
- * 
+ *
  * <p>
  * This interface extends the offer of adaptation methods with new methods which
  * interact with other common types like {@link Function} and {@link BiConsumer}
@@ -34,7 +34,7 @@ import java.util.function.Function;
  * with the respect to the intended use. However, all those method should follow
  * the same pattern, so that all the methods behave consistently. Following list
  * depicts the points to follow:
- * 
+ *
  * <ul>
  * <li>All methods that read some data should have a single parameter for the
  * data source. The data source is supposed to accept {@link #remap()} as the
@@ -54,7 +54,7 @@ import java.util.function.Function;
  * <li>A {@code set} method should use {@link #apply(Object)} to adapt the value
  * and store the result, using the {@code put} variant.</li>
  * </ul>
- * 
+ *
  * @param <K>
  *            the type of the remapping result
  * @param <V>
@@ -134,7 +134,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
 
     /**
      * Returns a representation of an adapted value from the source.
-     * 
+     *
      * @param source
      *            the source of the argument to adapt. It must not be
      *            {@code null}.
@@ -214,7 +214,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
 
     /**
      * Returns a representation of an adapted value from the source.
-     * 
+     *
      * @param source
      *            the source of the argument to adapt. It must not be
      *            {@code null}.
@@ -233,7 +233,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      *            value. It must not be {@code null}.
      * @param value
      *            the value to put
-     * 
+     *
      * @return the result of {@link Map#put(Object, Object)}
      */
     default Object put(Map<? super K, ? super V> consumer, V value) {
@@ -248,7 +248,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      *            value. It must not be {@code null}.
      * @param value
      *            the value to adapt and transfer
-     * 
+     *
      * @return the result of the {@link Map#put(Object, Object)}
      */
     default Object set(Map<? super K, ? super V> consumer, Object value) {
