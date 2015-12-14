@@ -18,6 +18,7 @@ package net.yetamine.sova.adaptation;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -184,19 +185,31 @@ public interface AdaptationResult<T> extends Supplier<T> {
         return AdaptationResult.of(operation, argument(), operation.fallback(get()));
     }
 
+    // Optional-like support
+
     /**
-     * Returns a result of a function that is applied on this instance.
+     * Returns {@code true} iff {@link #get()} returns a non-{@code null} value.
      *
-     * @param <V>
-     *            the return type of the returned function
-     * @param f
-     *            the function to apply. It must not be {@code null}.
-     *
-     * @return the result of the function
+     * @return {@code true} iff {@link #get()} returns a non-{@code null} value
      */
-    default <V> V map(Function<? super AdaptationResult<T>, ? extends V> f) {
-        return f.apply(this);
+    default boolean isPresent() {
+        return (get() != null);
     }
+
+    /**
+     * Invokes an consumer to accept the content if {@link #isPresent()}.
+     *
+     * @param consumer
+     *            the consumer to invoke. It must not be {@code null}.
+     */
+    default void ifPresent(Consumer<? super T> consumer) {
+        final T value = get();
+        if (value != null) {
+            consumer.accept(value);
+        }
+    }
+
+    // Factory methods
 
     /**
      * Returns an instance that represents the specified value.
