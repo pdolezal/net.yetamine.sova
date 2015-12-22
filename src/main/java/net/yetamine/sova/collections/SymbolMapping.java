@@ -161,4 +161,13 @@ public interface SymbolMapping {
     default <T> AdaptationResult<T> yield(Mappable<?, T> symbol) {
         return symbol.yield(map());
     }
+
+    /**
+     * Returns an empty instance.
+     *
+     * @return an empty instance
+     */
+    static SymbolMapping empty() {
+        return DefaultSymbolMapping.EMPTY;
+    }
 }

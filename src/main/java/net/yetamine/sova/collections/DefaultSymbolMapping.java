@@ -17,12 +17,13 @@
 package net.yetamine.sova.collections;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * A default implementation of the {@link SymbolMapping} interface that just adapts an
- * existing {@link Map} instance.
+ * A default implementation of the {@link SymbolMapping} interface that just
+ * adapts an existing {@link Map} instance.
  *
  * <p>
  * The implementation does not care about the map being read-only or not and
@@ -33,6 +34,9 @@ public final class DefaultSymbolMapping extends SymbolMappingAdapter implements 
 
     /** Serialization version: 1. */
     private static final long serialVersionUID = 1L;
+
+    /** Common shared instance for an empty mapping. */
+    static final SymbolMapping EMPTY = new DefaultSymbolMapping(Collections.emptyMap());
 
     /** Underlying map. */
     private final Map<?, ?> map;
