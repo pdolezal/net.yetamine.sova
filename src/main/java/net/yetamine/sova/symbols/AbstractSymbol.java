@@ -18,6 +18,7 @@ package net.yetamine.sova.symbols;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
@@ -52,17 +53,23 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
      * @see java.lang.Object#toString()
      */
     @Override
-    public String toString() {
+    public final String toString() {
         final StringJoiner result = new StringJoiner(", ", "symbol[", "]").setEmptyValue(super.toString());
-        introspect().forEach((name, value) -> result.add(new StringBuilder(name).append('=').append(value)));
+
+        introspect().forEach((name, value) -> {
+            if (name instanceof ToString) {
+                result.add(new StringBuilder(name.toString()).append('=').append(value));
+            }
+        });
+
         return result.toString();
     }
 
     /**
      * @see net.yetamine.sova.adaptation.Introspection#introspect()
      */
-    public final Map<String, ?> introspect() {
-        final Map<String, Object> result = new LinkedHashMap<>();
+    public final Map<?, ?> introspect() {
+        final Map<Object, Object> result = new LinkedHashMap<>();
         introspect(result);
         return result;
     }
@@ -187,14 +194,16 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.Mappable#put(java.util.Map, java.lang.Object)
+     * @see net.yetamine.sova.adaptation.Mappable#put(java.util.Map,
+     *      java.lang.Object)
      */
     public final Object put(Map<? super Symbol<T>, ? super T> consumer, T value) {
         return Symbol.super.put(consumer, value);
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.Mappable#set(java.util.Map, java.lang.Object)
+     * @see net.yetamine.sova.adaptation.Mappable#set(java.util.Map,
+     *      java.lang.Object)
      */
     public final Object set(Map<? super Symbol<T>, ? super T> consumer, Object value) {
         return Symbol.super.set(consumer, value);
@@ -209,12 +218,57 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
      * <p>
      * Implementations are supposed to invoke the inherited implementations and
      * just add their own data. But since the whole set is available, inherited
-     * classes may even remove elements that are not
+     * classes may even remove elements that are not correct for them.
+     *
+     * <p>
+     * Items to be inserted in {@link #toString()} representation, must have the
+     * their key made with {@link #toString(String)} method.
      *
      * @param result
      *            the resulting set. It must not be {@code null}.
      */
-    protected void introspect(Map<String, Object> result) {
+    protected void introspect(Map<Object, Object> result) {
         // Do nothing
+    }
+
+    /**
+     * Makes an object that {@link #toString()} recognizes as the key that shall
+     * appear in the string representation of this instance.
+     *
+     * @param identifier
+     *            the identifier to present. It must not be {@code null}.
+     *
+     * @return an object for {@link #toString()} representation identifier
+     */
+    protected final Object toString(String identifier) {
+        return new ToString(identifier);
+    }
+
+    /**
+     * A helper for marking {@link Introspection} items for {@link #toString()}
+     * representation.
+     */
+    private static final class ToString {
+
+        /** Identifier to display. */
+        private final String identifier;
+
+        /**
+         * Creates a new instance.
+         *
+         * @param id
+         *            the identifier to present. It must not be {@code null}.
+         */
+        public ToString(String id) {
+            identifier = Objects.requireNonNull(id);
+        }
+
+        /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return identifier;
+        }
     }
 }

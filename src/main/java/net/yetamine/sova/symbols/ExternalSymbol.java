@@ -128,8 +128,8 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
      * @see net.yetamine.sova.symbols.AbstractSymbol#introspect(java.util.Map)
      */
     @Override
-    protected void introspect(Map<String, Object> result) {
+    protected void introspect(Map<Object, Object> result) {
         super.introspect(result);
-        result.put("uid", identifier);
+        result.put(toString("uid"), identifier);
     }
 }

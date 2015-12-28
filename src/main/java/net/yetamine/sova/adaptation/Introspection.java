@@ -19,6 +19,8 @@ package net.yetamine.sova.adaptation;
 import java.util.Collections;
 import java.util.Map;
 
+// TODO: to be replaced by net.yetamine.lang.Introspection
+
 /**
  * Indicates support for retrieving additional information of an instance to aid
  * debugging, logging and other kind of introspective processing.
@@ -40,7 +42,7 @@ public interface Introspection {
      * @return the set of introspective descriptions; never {@code null}, but
      *         possibly unmodifiable
      */
-    default Map<String, ?> introspect() {
+    default Map<?, ?> introspect() {
         return Collections.emptyMap();
     }
 }

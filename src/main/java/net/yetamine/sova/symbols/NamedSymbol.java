@@ -104,9 +104,9 @@ public final class NamedSymbol<T> extends DelegatingSymbol<T> implements TaggedS
      * @see net.yetamine.sova.symbols.AbstractSymbol#introspect(java.util.Map)
      */
     @Override
-    protected void introspect(Map<String, Object> result) {
+    protected void introspect(Map<Object, Object> result) {
         super.introspect(result);
-        result.put("id", String.format("hash:%08x", System.identityHashCode(this)));
-        result.put("tag", tag);
+        result.put(toString("id"), String.format("hash:%08x", System.identityHashCode(this)));
+        result.put(toString("tag"), tag);
     }
 }

@@ -82,9 +82,9 @@ public class InternalSymbol<T> extends DelegatingSymbol<T> {
      * @see net.yetamine.sova.symbols.AbstractSymbol#introspect(java.util.Map)
      */
     @Override
-    protected void introspect(Map<String, Object> result) {
+    protected void introspect(Map<Object, Object> result) {
         super.introspect(result);
-        result.put("id", String.format("hash:%08x", System.identityHashCode(this)));
-        result.put("class", getClass().getTypeName());
+        result.put(toString("id"), String.format("hash:%08x", System.identityHashCode(this)));
+        result.put(toString("class"), getClass().getTypeName());
     }
 }
