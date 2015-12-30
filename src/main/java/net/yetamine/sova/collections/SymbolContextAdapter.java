@@ -119,7 +119,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
         });
 
         // Verify that the result is either null, or is equal to what the adaptation would return
-        assert((result == null) || result.equals(symbol.apply(result)));
+        assert (result == null) || result.equals(symbol.apply(result));
         return result;
     }
 
@@ -186,6 +186,14 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      */
     public <K, T> T computeIfPresent(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remapping) {
         return compute(symbol, (t, v) -> (v != null) ? symbol.adapt(remapping.apply(t, v)).request() : null);
+    }
+
+    /**
+     * @see net.yetamine.sova.collections.SymbolContext#putAll(net.yetamine.sova.collections.SymbolMapping)
+     */
+    public SymbolContext putAll(SymbolMapping source) {
+        storage().putAll(source.map());
+        return this;
     }
 
     /**

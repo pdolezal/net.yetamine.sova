@@ -372,4 +372,16 @@ public interface SymbolContext extends SymbolMapping {
      *             if a value could not be associated with the specified symbol
      */
     <K, T> T computeIfPresent(Mappable<K, T> symbol, BiFunction<? super K, ? super T, ? extends T> remappingFunction);
+
+    /**
+     * Puts all mappings from the provided source; existing associations for the
+     * symbols provided by the source are replaced.
+     *
+     * @param source
+     *            the source of mappings to put in this context. It must not be
+     *            {@code null}.
+     *
+     * @return this instance
+     */
+    SymbolContext putAll(SymbolMapping source);
 }
