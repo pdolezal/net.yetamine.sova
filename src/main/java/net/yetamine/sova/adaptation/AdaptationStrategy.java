@@ -30,6 +30,11 @@ import java.util.function.Supplier;
  * practice is making an implementation immutable and returning constant values,
  * or when the values might be mutable, return copies.
  *
+ * <p>
+ * This interface intentionally does not inherit from {@link Function} to allow
+ * inherited types to decide themselves if, how and for which purpose would the
+ * prominent function-like capability provide.
+ *
  * @param <T>
  *            the type of resulting values
  */
@@ -54,10 +59,24 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      * @return an object for retrieving the result of the adaptation
      */
     default AdaptationResult<T> adapt(Object o) {
-        return AdaptationResult.of(this, o, apply(o));
+        return AdaptationResult.of(this, o, treat(o));
     }
 
     // Convenient application methods
+
+    /**
+     * Returns the result of the adaptation of the given argument; this method
+     * is a shortcut for {@code adaptation().apply(o)}.
+     *
+     * @param o
+     *            the argument to adapt
+     *
+     * @return the result of the adaptation, or {@code null} if the argument is
+     *         {@code null} or could not be adapted
+     */
+    default T treat(Object o) {
+        return adaptation().apply(o);
+    }
 
     /**
      * Returns the default value if the argument is {@code null}, otherwise the
@@ -88,20 +107,6 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
     }
 
     /**
-     * Returns the result of the adaptation of the given argument; this method
-     * is a shortcut for {@code adaptation().apply(o)}.
-     *
-     * @param o
-     *            the argument to adapt
-     *
-     * @return the result of the adaptation, or {@code null} if the argument is
-     *         {@code null} or could not be adapted
-     */
-    default T apply(Object o) {
-        return adaptation().apply(o);
-    }
-
-    /**
      * Returns the result of the adaptation of the given argument or the default
      * value; this method is a shortcut for {@code fallback(apply(o))}.
      *
@@ -113,7 +118,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      *         valid object
      */
     default T recover(Object o) {
-        return fallback(apply(o));
+        return fallback(treat(o));
     }
 
     /**

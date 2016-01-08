@@ -42,7 +42,7 @@ import java.util.function.Function;
  * <li>All methods that store some data should have two parameters: the first as
  * the data target, the second as the value to be stored. The data target should
  * accept {@link #remap()} as the key.</li>
- * <li>A {@code get} method should use {@link #apply(Object)} to adapt the
+ * <li>A {@code get} method should use {@link #treat(Object)} to adapt the
  * result of the data source.</li>
  * <li>A {@code use} method should use {@link #recover(Object)} to adapt the
  * result of the data source.</li>
@@ -51,7 +51,7 @@ import java.util.function.Function;
  * <li>A {@code yield} method should use {@link #adapt(Object)} to adapt the
  * result of the data source.</li>
  * <li>A {@code put} method should just store the value.</li>
- * <li>A {@code set} method should use {@link #apply(Object)} to adapt the value
+ * <li>A {@code set} method should use {@link #treat(Object)} to adapt the value
  * and store the result, using the {@code put} variant.</li>
  * </ul>
  *
@@ -103,7 +103,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * @return the result of the adaptation, or {@code null} if not possible
      */
     default V get(Function<? super K, ?> source) {
-        return apply(source.apply(remap()));
+        return treat(source.apply(remap()));
     }
 
     /**
@@ -183,7 +183,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * @return the result of the adaptation, or {@code null} if not possible
      */
     default V get(Map<?, ?> source) {
-        return apply(source.get(remap()));
+        return treat(source.get(remap()));
     }
 
     /**
@@ -252,6 +252,6 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * @return the result of the {@link Map#put(Object, Object)}
      */
     default Object set(Map<? super K, ? super V> consumer, Object value) {
-        return put(consumer, apply(value));
+        return put(consumer, treat(value));
     }
 }

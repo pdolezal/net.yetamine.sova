@@ -75,10 +75,10 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationStrategy#apply(java.lang.Object)
+     * @see net.yetamine.sova.adaptation.AdaptationStrategy#treat(java.lang.Object)
      */
-    public final T apply(Object o) {
-        return Symbol.super.apply(o);
+    public final T treat(Object o) {
+        return Symbol.super.treat(o);
     }
 
     /**
