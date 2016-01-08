@@ -18,13 +18,13 @@ package net.yetamine.sova.symbols;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import net.yetamine.lang.formatting.ToString;
 import net.yetamine.lang.introspective.Introspection;
 import net.yetamine.sova.AdaptationResult;
 import net.yetamine.sova.Symbol;
@@ -243,33 +243,5 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
      */
     protected final Object toString(String identifier) {
         return new ToString(identifier);
-    }
-
-    /**
-     * A helper for marking {@link Introspection} items for {@link #toString()}
-     * representation.
-     */
-    private static final class ToString {
-
-        /** Identifier to display. */
-        private final String identifier;
-
-        /**
-         * Creates a new instance.
-         *
-         * @param id
-         *            the identifier to present. It must not be {@code null}.
-         */
-        public ToString(String id) {
-            identifier = Objects.requireNonNull(id);
-        }
-
-        /**
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString() {
-            return identifier;
-        }
     }
 }
