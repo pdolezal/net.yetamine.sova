@@ -66,4 +66,12 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.yetamine</groupId>
+            <artifactId>net.yetamine.lang</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
 </project>

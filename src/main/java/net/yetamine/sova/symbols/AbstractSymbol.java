@@ -25,8 +25,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import net.yetamine.lang.introspective.Introspection;
 import net.yetamine.sova.AdaptationResult;
-import net.yetamine.sova.Introspection;
 import net.yetamine.sova.Symbol;
 
 /**
@@ -67,7 +67,7 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.Introspection#introspect()
+     * @see net.yetamine.lang.introspective.Introspection#introspect()
      */
     public final Map<?, ?> introspect() {
         final Map<Object, Object> result = new LinkedHashMap<>();
