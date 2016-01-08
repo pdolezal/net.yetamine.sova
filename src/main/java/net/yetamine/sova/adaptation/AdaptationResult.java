@@ -226,30 +226,59 @@ public interface AdaptationResult<T> extends Supplier<T> {
      * @return an instance that represents the specified value
      */
     static <T> AdaptationResult<T> of(AdaptationStrategy<T> operation, Object argument, T value) {
-        Objects.requireNonNull(operation);
+        return new DefaultAdaptationResult<>(operation, argument, value);
+    }
+}
 
-        return new AdaptationResult<T>() {
+/**
+ * The default implementation for {@link AdaptationResult}.
+ *
+ * @param <T>
+ *            the type of the represented value
+ */
+final class DefaultAdaptationResult<T> implements AdaptationResult<T> {
 
-            /**
-             * @see net.yetamine.sova.adaptation.AdaptationResult#operation()
-             */
-            public AdaptationStrategy<T> operation() {
-                return operation;
-            }
+    /** Operation that has been executed. */
+    private final AdaptationStrategy<T> operation;
+    /** Argument of the operation. */
+    private final Object argument;
+    /** Value to represent. */
+    private final T value;
 
-            /**
-             * @see net.yetamine.sova.adaptation.AdaptationResult#argument()
-             */
-            public Object argument() {
-                return argument;
-            }
+    /**
+     * Creates a new instance.
+     *
+     * @param strategy
+     *            the related operation. It must not be {@code null}.
+     * @param arg
+     *            the argument of the operation
+     * @param val
+     *            the value to represent
+     */
+    public DefaultAdaptationResult(AdaptationStrategy<T> strategy, Object arg, T val) {
+        operation = Objects.requireNonNull(strategy);
+        argument = arg;
+        value = val;
+    }
 
-            /**
-             * @see net.yetamine.sova.adaptation.AdaptationResult#get()
-             */
-            public T get() {
-                return value;
-            }
-        };
+    /**
+     * @see net.yetamine.sova.adaptation.AdaptationResult#operation()
+     */
+    public AdaptationStrategy<T> operation() {
+        return operation;
+    }
+
+    /**
+     * @see net.yetamine.sova.adaptation.AdaptationResult#argument()
+     */
+    public Object argument() {
+        return argument;
+    }
+
+    /**
+     * @see net.yetamine.sova.adaptation.AdaptationResult#get()
+     */
+    public T get() {
+        return value;
     }
 }
