@@ -18,6 +18,7 @@ package net.yetamine.sova.collections;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -54,6 +55,21 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      */
     public SymbolMapping unmodifiable() {
         return new DefaultSymbolMapping(Collections.unmodifiableMap(storage()));
+    }
+
+    /**
+     * @see net.yetamine.sova.collections.SymbolContext#let(net.yetamine.sova.adaptation.Mappable)
+     */
+    public <T> T let(Mappable<?, ? extends T> symbol) {
+        return symbol.derive(storage().compute(symbol.remap(), (k, v) -> symbol.recover(v)));
+    }
+
+    /**
+     * @see net.yetamine.sova.collections.SymbolContext#have(net.yetamine.sova.adaptation.Mappable)
+     */
+    public <T> Optional<T> have(Mappable<?, ? extends T> symbol) {
+        final Object result = storage().computeIfAbsent(symbol.remap(), k -> symbol.fallback().get());
+        return Optional.ofNullable(symbol.derive(result));
     }
 
     /**

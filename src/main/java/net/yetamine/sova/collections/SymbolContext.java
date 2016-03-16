@@ -17,6 +17,7 @@
 package net.yetamine.sova.collections;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -119,6 +120,34 @@ public interface SymbolContext extends SymbolMapping {
         putIfAbsent(symbol, value);
         return this;
     }
+
+    /**
+     * Puts the default to this instance if the mapping does not provide an
+     * adaptable value and returns the adaptation of the value then.
+     *
+     * @param <T>
+     *            the type of the value
+     * @param symbol
+     *            the symbol defining the mapping. It must not be {@code null}.
+     *
+     * @return the result of adaptation, or {@code null} if there is no default
+     */
+    <T> T let(Mappable<?, ? extends T> symbol);
+
+    /**
+     * Puts the default to this instance if the mapping is absent, otherwise
+     * tries to use the present mapping to get the result.
+     *
+     * @param <T>
+     *            the type of the value
+     * @param symbol
+     *            the symbol defining the mapping. It must not be {@code null}.
+     *
+     * @return the adaptation of the resulting value; an empty container is
+     *         returned if the value could not be adapted, or no default is
+     *         provided
+     */
+    <T> Optional<T> have(Mappable<?, ? extends T> symbol);
 
     /**
      * Removes all entries, making this instance empty.
