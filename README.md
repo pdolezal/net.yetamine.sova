@@ -38,6 +38,11 @@ For using the built library is needed:
 * JRE 8 or newer.
 
 
+## Acknowledgments ##
+
+A special thanks belongs to [Atos](http://atos.net/). The development of this library would be much slower without their support which provided a great opportunity to verify the library practically and improve it according to the experience.
+
+
 ## Licensing ##
 
 The project is licensed under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0). Contributions to the project are welcome and accepted if they can be incorporated without the need of changing the license or license conditions and terms.
