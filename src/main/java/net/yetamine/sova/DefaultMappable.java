@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.adaptation;
+package net.yetamine.sova;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -59,28 +59,28 @@ public final class DefaultMappable<K, V> implements Mappable<K, V> {
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.Mappable#remap()
+     * @see net.yetamine.sova.Mappable#remap()
      */
     public K remap() {
         return remapping.get();
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationStrategy#adaptation()
+     * @see net.yetamine.sova.AdaptationStrategy#adaptation()
      */
     public Adaptation<V> adaptation() {
         return provider.adaptation();
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationProvider#fallback()
+     * @see net.yetamine.sova.AdaptationProvider#fallback()
      */
     public Supplier<? extends V> fallback() {
         return provider.fallback();
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationStrategy#rtti()
+     * @see net.yetamine.sova.AdaptationStrategy#rtti()
      */
     public Class<V> rtti() {
         return provider.rtti();

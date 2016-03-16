@@ -21,10 +21,10 @@
  * <h1>Overview</h1>
  *
  * <p>
- * Although the {@link net.yetamine.sova.symbols.Symbol} hierarchy provides
- * support for using a {@link java.util.Map} as a native value source, the
- * {@code Map} interface is not designed as a heterogenous container and
- * therefore not too comfortable to use with symbols.
+ * Although the {@link net.yetamine.sova.Symbol} hierarchy provides support for
+ * using a {@link java.util.Map} as a native value source, the {@code Map}
+ * interface is not designed as a heterogenous container and therefore not too
+ * comfortable to use with symbols.
  *
  * <p>
  * This package provides interfaces for native symbol-based map-like collections

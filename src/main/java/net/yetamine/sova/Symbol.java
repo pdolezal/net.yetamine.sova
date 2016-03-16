@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.symbols;
-
-import net.yetamine.sova.adaptation.Mappable;
+package net.yetamine.sova;
 
 /**
  * An extension of the {@link Mappable} interface that enables using self as the
@@ -42,7 +40,7 @@ public interface Symbol<T> extends Mappable<Symbol<T>, T> {
      *
      * @return {@code this}
      *
-     * @see net.yetamine.sova.adaptation.Mappable#remap()
+     * @see net.yetamine.sova.Mappable#remap()
      */
     default Symbol<T> remap() {
         return this;

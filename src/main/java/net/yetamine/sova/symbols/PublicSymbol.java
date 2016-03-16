@@ -16,8 +16,9 @@
 
 package net.yetamine.sova.symbols;
 
-import net.yetamine.sova.adaptation.DefaultMappable;
-import net.yetamine.sova.adaptation.Mappable;
+import net.yetamine.sova.DefaultMappable;
+import net.yetamine.sova.Mappable;
+import net.yetamine.sova.Symbol;
 
 /**
  * An extension of the {@link Symbol} interface that links every instance to a
@@ -59,7 +60,7 @@ public interface PublicSymbol<I, V> extends Symbol<V> {
      *
      * @return {@code true} if the object is equal to this instance
      *
-     * @see net.yetamine.sova.symbols.Symbol#equals(java.lang.Object)
+     * @see net.yetamine.sova.Symbol#equals(java.lang.Object)
      */
     boolean equals(Object o);
 

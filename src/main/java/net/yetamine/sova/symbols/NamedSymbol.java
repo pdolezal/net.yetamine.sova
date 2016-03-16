@@ -18,8 +18,8 @@ package net.yetamine.sova.symbols;
 
 import java.util.Map;
 
-import net.yetamine.sova.adaptation.AdaptationProvider;
-import net.yetamine.sova.adaptation.Downcasting;
+import net.yetamine.sova.AdaptationProvider;
+import net.yetamine.sova.Downcasting;
 
 /**
  * An implementation of {@link AnnotatedSymbol} that uses a {@link String}. The

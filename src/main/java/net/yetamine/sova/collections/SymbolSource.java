@@ -18,8 +18,8 @@ package net.yetamine.sova.collections;
 
 import java.util.Optional;
 
-import net.yetamine.sova.adaptation.AdaptationResult;
-import net.yetamine.sova.adaptation.Mappable;
+import net.yetamine.sova.AdaptationResult;
+import net.yetamine.sova.Mappable;
 
 /**
  * An unmodifiable symbol-based value source.

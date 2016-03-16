@@ -123,6 +123,7 @@
  * </pre>
  *
  * Another approach might employ an adapter for the {@code ServletRequest} which
- * could provide even better support for more and more generic symbol types.
+ * could provide even better support for more and more generic symbol types, but
+ * allocating such adapters would not be efficient in most cases.
  */
 package net.yetamine.sova;

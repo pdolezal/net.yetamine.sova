@@ -21,8 +21,8 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import net.yetamine.sova.adaptation.AdaptationException;
-import net.yetamine.sova.adaptation.Mappable;
+import net.yetamine.sova.AdaptationException;
+import net.yetamine.sova.Mappable;
 
 /**
  * A mutable symbol-based view of a {@link Map}.

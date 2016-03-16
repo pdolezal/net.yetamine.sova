@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.adaptation;
+package net.yetamine.sova;
 
 /**
  * Thrown when an argument could not be adapted.

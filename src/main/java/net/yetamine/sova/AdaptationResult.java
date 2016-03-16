@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.adaptation;
+package net.yetamine.sova;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -290,14 +290,14 @@ abstract class AbstractAdaptationResult<T> implements AdaptationResult<T> {
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationResult#argument()
+     * @see net.yetamine.sova.AdaptationResult#argument()
      */
     public final Object argument() {
         return argument;
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationResult#get()
+     * @see net.yetamine.sova.AdaptationResult#get()
      */
     public final T get() {
         return value;
@@ -340,7 +340,7 @@ final class DefaultAdaptationResult<T> extends AbstractAdaptationResult<T> {
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationResult#fallback()
+     * @see net.yetamine.sova.AdaptationResult#fallback()
      */
     public AdaptationResult<T> fallback() {
         return new FallbackAdaptationResult<>(argument(), fallback.get());
@@ -377,7 +377,7 @@ final class ImmediateAdaptationResult<T> extends AbstractAdaptationResult<T> {
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationResult#fallback()
+     * @see net.yetamine.sova.AdaptationResult#fallback()
      */
     public AdaptationResult<T> fallback() {
         return new FallbackAdaptationResult<>(argument(), null);
@@ -414,7 +414,7 @@ final class FallbackAdaptationResult<T> extends AbstractAdaptationResult<T> {
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationResult#fallback()
+     * @see net.yetamine.sova.AdaptationResult#fallback()
      */
     public AdaptationResult<T> fallback() {
         return this;

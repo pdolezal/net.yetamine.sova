@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.adaptation;
+package net.yetamine.sova;
 
 import java.util.Map;
 import java.util.Optional;

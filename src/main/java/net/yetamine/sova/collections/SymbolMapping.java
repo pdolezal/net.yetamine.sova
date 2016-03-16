@@ -19,8 +19,8 @@ package net.yetamine.sova.collections;
 import java.util.Map;
 import java.util.Optional;
 
-import net.yetamine.sova.adaptation.AdaptationResult;
-import net.yetamine.sova.adaptation.Mappable;
+import net.yetamine.sova.AdaptationResult;
+import net.yetamine.sova.Mappable;
 
 /**
  * An unmodifiable symbol-based view of a {@link Map}.
@@ -77,28 +77,28 @@ public interface SymbolMapping extends SymbolSource {
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolSource#get(net.yetamine.sova.adaptation.Mappable)
+     * @see net.yetamine.sova.collections.SymbolSource#get(net.yetamine.sova.Mappable)
      */
     default <T> T get(Mappable<?, T> symbol) {
         return symbol.get(map());
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolSource#use(net.yetamine.sova.adaptation.Mappable)
+     * @see net.yetamine.sova.collections.SymbolSource#use(net.yetamine.sova.Mappable)
      */
     default <T> T use(Mappable<?, T> symbol) {
         return symbol.use(map());
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolSource#find(net.yetamine.sova.adaptation.Mappable)
+     * @see net.yetamine.sova.collections.SymbolSource#find(net.yetamine.sova.Mappable)
      */
     default <T> Optional<T> find(Mappable<?, T> symbol) {
         return symbol.find(map());
     }
 
     /**
-     * @see net.yetamine.sova.collections.SymbolSource#yield(net.yetamine.sova.adaptation.Mappable)
+     * @see net.yetamine.sova.collections.SymbolSource#yield(net.yetamine.sova.Mappable)
      */
     default <T> AdaptationResult<T> yield(Mappable<?, T> symbol) {
         return symbol.yield(map());

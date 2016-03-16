@@ -19,9 +19,9 @@ package net.yetamine.sova.symbols;
 import java.util.Map;
 import java.util.Objects;
 
-import net.yetamine.sova.adaptation.AdaptationProvider;
-import net.yetamine.sova.adaptation.Downcasting;
-import net.yetamine.sova.adaptation.Mappable;
+import net.yetamine.sova.AdaptationProvider;
+import net.yetamine.sova.Downcasting;
+import net.yetamine.sova.Mappable;
 
 /**
  * A symbol implementation which is coupled with a published identifier that is

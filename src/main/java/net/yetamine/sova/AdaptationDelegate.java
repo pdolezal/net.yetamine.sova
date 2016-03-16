@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.sova.adaptation;
+package net.yetamine.sova;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -57,21 +57,21 @@ public class AdaptationDelegate<T> implements AdaptationProvider<T> {
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationStrategy#adaptation()
+     * @see net.yetamine.sova.AdaptationStrategy#adaptation()
      */
     public final Adaptation<T> adaptation() {
         return adaptation;
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationProvider#fallback()
+     * @see net.yetamine.sova.AdaptationProvider#fallback()
      */
     public final Supplier<? extends T> fallback() {
         return fallback;
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationStrategy#rtti()
+     * @see net.yetamine.sova.AdaptationStrategy#rtti()
      */
     public final Class<T> rtti() {
         return rtti;

@@ -18,8 +18,8 @@ package net.yetamine.sova.symbols;
 
 import java.util.function.Supplier;
 
-import net.yetamine.sova.adaptation.Adaptation;
-import net.yetamine.sova.adaptation.AdaptationProvider;
+import net.yetamine.sova.Adaptation;
+import net.yetamine.sova.AdaptationProvider;
 
 /**
  * An abstract base class that uses another {@link AdaptationProvider}.
@@ -56,21 +56,21 @@ public abstract class DelegatingSymbol<T> extends AbstractSymbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationProvider#adaptation()
+     * @see net.yetamine.sova.AdaptationProvider#adaptation()
      */
     public final Adaptation<T> adaptation() {
         return adaptation;
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationProvider#fallback()
+     * @see net.yetamine.sova.AdaptationProvider#fallback()
      */
     public final Supplier<? extends T> fallback() {
         return fallback;
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationProvider#rtti()
+     * @see net.yetamine.sova.AdaptationProvider#rtti()
      */
     public final Class<T> rtti() {
         return rtti;

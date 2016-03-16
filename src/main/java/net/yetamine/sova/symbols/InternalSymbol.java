@@ -18,8 +18,8 @@ package net.yetamine.sova.symbols;
 
 import java.util.Map;
 
-import net.yetamine.sova.adaptation.AdaptationProvider;
-import net.yetamine.sova.adaptation.Downcasting;
+import net.yetamine.sova.AdaptationProvider;
+import net.yetamine.sova.Downcasting;
 
 /**
  * A symbol implementation that intentionally uses instance identity, therefore
