@@ -31,14 +31,7 @@ import java.util.function.Supplier;
  * @param <T>
  *            the type of resulting values
  */
-public final class Downcasting<T> implements AdaptationProvider<T> {
-
-    /** Actual adaptation implementation. */
-    private final Adaptation<T> adaptation;
-    /** Actual supplier of the default values. */
-    private final Supplier<? extends T> fallback;
-    /** Run-time type information for the values. */
-    private final Class<T> rtti;
+public final class Downcasting<T> extends AdaptationDelegate<T> {
 
     /**
      * Creates a new instance.
@@ -49,48 +42,9 @@ public final class Downcasting<T> implements AdaptationProvider<T> {
      *            the adaptation implementation. It must not be {@code null}.
      * @param defaulting
      *            the fallback supplier. It must not be {@code null}.
-     *
-     * @throws ClassCastException
-     *             if the fallback supplier provides an instance that is not an
-     *             instance of the given type
-     * @throws AdaptationException
-     *             if the fallback supplier provides a value that is not stable
-     *             and accepted by the adaptation implementation
      */
     private Downcasting(Class<T> type, Adaptation<T> adapting, Supplier<? extends T> defaulting) {
-        // Following code verifies the contract at least in the special case
-        // which could be easily violated by a programming error
-        final T fallbackResult = type.cast(defaulting.get());
-        if (!Objects.deepEquals(fallbackResult, adapting.apply(fallbackResult))) {
-            throw new AdaptationException(fallbackResult);
-        }
-
-        adaptation = adapting;
-        fallback = defaulting;
-        rtti = type;
-    }
-
-    // Core methods
-
-    /**
-     * @see net.yetamine.sova.adaptation.AdaptationStrategy#adaptation()
-     */
-    public Adaptation<T> adaptation() {
-        return adaptation;
-    }
-
-    /**
-     * @see net.yetamine.sova.adaptation.AdaptationProvider#fallback()
-     */
-    public Supplier<? extends T> fallback() {
-        return fallback;
-    }
-
-    /**
-     * @see net.yetamine.sova.adaptation.AdaptationStrategy#rtti()
-     */
-    public Class<T> rtti() {
-        return rtti;
+        super(type, adapting, defaulting);
     }
 
     // Factory methods
@@ -199,7 +153,7 @@ public final class Downcasting<T> implements AdaptationProvider<T> {
      * @return the new instance
      */
     public Downcasting<T> fallbackTo(T value) {
-        return new Downcasting<>(rtti, adaptation, () -> value);
+        return new Downcasting<>(rtti(), adaptation(), () -> value);
     }
 
     /**
@@ -213,7 +167,7 @@ public final class Downcasting<T> implements AdaptationProvider<T> {
      * @return the new instance
      */
     public Downcasting<T> fallback(Supplier<? extends T> value) {
-        return new Downcasting<>(rtti, adaptation, value);
+        return new Downcasting<>(rtti(), adaptation(), value);
     }
 
     // Supportive casting methods
