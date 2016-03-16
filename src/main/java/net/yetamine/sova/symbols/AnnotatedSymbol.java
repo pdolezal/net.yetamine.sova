@@ -17,26 +17,26 @@
 package net.yetamine.sova.symbols;
 
 /**
- * An extension of the {@link Symbol} interface that allows attaching a tag that
- * helps manipulations with the symbol for the purpose of presentation, logging,
- * debugging etc.
+ * An extension of the {@link Symbol} interface that can equipped with an
+ * annotation that helps manipulations with the symbol for the purpose of
+ * presentation, logging, debugging etc.
  *
  * <p>
- * Tags must be of an (effectively) immutable type and must not affect comparing
- * instances on equality as they serve merely for manipulations, but not helping
- * to understand or define the semantics of a particular symbol.
+ * An annotations must be of an (effectively) immutable type and must not affect
+ * equality definition of the instances as it does not define any semantics of a
+ * particular symbol.
  *
- * @param <T>
- *            the type of the tag
+ * @param <A>
+ *            the type of the annotation
  * @param <V>
  *            the type of resulting values
  */
-public interface TaggedSymbol<T, V> extends Symbol<V> {
+public interface AnnotatedSymbol<A, V> extends Symbol<V> {
 
     /**
-     * Returns the tag of this instance.
+     * Returns the annotation of this instance.
      *
-     * @return the tag of this instance
+     * @return the annotation of this instance
      */
-    T tag();
+    A annotation();
 }

@@ -22,49 +22,51 @@ import net.yetamine.sova.adaptation.AdaptationProvider;
 import net.yetamine.sova.adaptation.Downcasting;
 
 /**
- * An implementation of {@link TaggedSymbol} that declares a {@link String} tag.
- * The tag is intended to provide a human-friendly name of the particular symbol
- * instance for debugging purposes.
+ * An implementation of {@link AnnotatedSymbol} that uses a {@link String}. The
+ * annotation is intended to provide a human-friendly name of a symbol instance
+ * for debugging purposes.
  *
  * @param <T>
  *            the type of resulting values
  */
-public final class NamedSymbol<T> extends DelegatingSymbol<T> implements TaggedSymbol<String, T> {
+public final class NamedSymbol<T> extends InternalSymbol<T> implements AnnotatedSymbol<String, T> {
 
-    /** Tag of this instance. */
-    private final String tag;
+    /** Annotation of this instance. */
+    private final String annotation;
 
     /**
      * Create a new instance.
      *
-     * @param instanceTag
-     *            the tag of this instance. It must not be {@code null}.
+     * @param name
+     *            the name of this instance that shall be available as the
+     *            annotation. It must not be {@code null}.
      * @param provider
      *            the adaptation provider. It must not be {@code null}.
      */
-    public NamedSymbol(String instanceTag, AdaptationProvider<T> provider) {
+    public NamedSymbol(String name, AdaptationProvider<T> provider) {
         super(provider);
-        tag = instanceTag;
+        annotation = name;
     }
 
     /**
      * Creates a new instance using {@link Downcasting#to(Class)}.
      *
-     * @param instanceTag
-     *            the tag of the new instance. It must not be {@code null}.
+     * @param name
+     *            the name of this instance that shall be available as the
+     *            annotation. It must not be {@code null}.
      * @param type
      *            the desired type of resulting values. It must not be
      *            {@code null}.
      */
-    public NamedSymbol(String instanceTag, Class<T> type) {
-        this(instanceTag, Downcasting.to(type));
+    public NamedSymbol(String name, Class<T> type) {
+        this(name, Downcasting.to(type));
     }
 
     /**
-     * @see net.yetamine.sova.symbols.TaggedSymbol#tag()
+     * @see net.yetamine.sova.symbols.AnnotatedSymbol#annotation()
      */
-    public String tag() {
-        return tag;
+    public String annotation() {
+        return annotation;
     }
 
     /**
@@ -106,7 +108,6 @@ public final class NamedSymbol<T> extends DelegatingSymbol<T> implements TaggedS
     @Override
     protected void introspect(Map<Object, Object> result) {
         super.introspect(result);
-        result.put(toString("id"), String.format("hash:%08x", System.identityHashCode(this)));
-        result.put(toString("tag"), tag);
+        result.put(toString("annotation"), annotation);
     }
 }
