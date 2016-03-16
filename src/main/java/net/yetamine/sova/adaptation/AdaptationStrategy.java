@@ -41,9 +41,8 @@ import java.util.function.Supplier;
 public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
 
     /**
-     * Returns an object for representing the result of the adaptation, which
-     * offers flexible means to consider the fallback value and apply other
-     * post-conditions.
+     * Returns a representation of the adaptation result, which offers flexible
+     * means to consider the fallback, if any, and apply other post-conditions.
      *
      * <p>
      * The default implementation evaluates the adaptation of the argument right
@@ -59,7 +58,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      * @return an object for retrieving the result of the adaptation
      */
     default AdaptationResult<T> adapt(Object o) {
-        return AdaptationResult.of(this, o, treat(o));
+        return AdaptationResult.of(o, derive(o), this);
     }
 
     // Convenient application methods
@@ -74,7 +73,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      * @return the result of the adaptation, or {@code null} if the argument is
      *         {@code null} or could not be adapted
      */
-    default T treat(Object o) {
+    default T derive(Object o) {
         return adaptation().apply(o);
     }
 
@@ -118,7 +117,7 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      *         valid object
      */
     default T recover(Object o) {
-        return fallback(treat(o));
+        return fallback(derive(o));
     }
 
     /**

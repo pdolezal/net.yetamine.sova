@@ -38,19 +38,14 @@ import java.util.function.Supplier;
 public interface AdaptationResult<T> extends Supplier<T> {
 
     /**
-     * Returns the operation that produced the original result.
-     *
-     * @return the operation that produced the original result
-     */
-    AdaptationStrategy<T> operation();
-
-    /**
      * Returns the original argument of the operation, i.e., the argument to
      * adapt.
      *
      * @return the original argument of the operation
      */
     Object argument();
+
+    // Core result-access methods
 
     /**
      * Returns the result represented by this instance.
@@ -159,32 +154,6 @@ public interface AdaptationResult<T> extends Supplier<T> {
         return Optional.ofNullable(get());
     }
 
-    /**
-     * Returns an instance which represents either the same result as this
-     * instance, or the default value if the result is {@code null}.
-     *
-     * <p>
-     * This method allows patterns like:
-     *
-     * <pre>
-     * adapted = adaptationStrategy.adapt(adaptee).fallback().require();
-     * </pre>
-     *
-     * The previous code provides the same result as:
-     *
-     * <pre>
-     * adapted = Optional.ofNullable(adaptationStrategy.recover(adaptee)).orElseThrow(AdaptationException::new);
-     * </pre>
-     *
-     * The former code is considerably more concise and clearer.
-     *
-     * @return an instance representing the result or the default
-     */
-    default AdaptationResult<T> fallback() {
-        final AdaptationStrategy<T> operation = operation();
-        return AdaptationResult.of(operation, argument(), operation.fallback(get()));
-    }
-
     // Optional-like support
 
     /**
@@ -209,6 +178,31 @@ public interface AdaptationResult<T> extends Supplier<T> {
         }
     }
 
+    // Fallback chaining support
+
+    /**
+     * Returns an instance which represents either the same result as this
+     * instance, or the default value if the result is {@code null}.
+     *
+     * <p>
+     * This method allows patterns like:
+     *
+     * <pre>
+     * adapted = adaptationStrategy.adapt(adaptee).fallback().require();
+     * </pre>
+     *
+     * The previous code provides the same result as:
+     *
+     * <pre>
+     * adapted = Optional.ofNullable(adaptationStrategy.recover(adaptee)).orElseThrow(AdaptationException::new);
+     * </pre>
+     *
+     * The former code is considerably more concise and clearer.
+     *
+     * @return an instance representing the result or the default
+     */
+    AdaptationResult<T> fallback();
+
     // Factory methods
 
     /**
@@ -216,69 +210,213 @@ public interface AdaptationResult<T> extends Supplier<T> {
      *
      * @param <T>
      *            the type of resulting values
+     * @param argument
+     *            the argument of the operation
+     * @param value
+     *            the value to represent
      * @param operation
-     *            the related operation. It must not be {@code null}.
+     *            the operation that shall supply the fallback. It must not be
+     *            {@code null}.
+     *
+     * @return an instance that represents the specified value
+     */
+    static <T> AdaptationResult<T> of(Object argument, T value, AdaptationStrategy<T> operation) {
+        final Supplier<? extends T> fallback = operation.fallback();
+        return (fallback != null) ? of(argument, value, fallback) : of(argument, value);
+    }
+
+    /**
+     * Returns an instance that represents the specified value and provides a
+     * fallback using the given supplier.
+     *
+     * @param <T>
+     *            the type of resulting values
+     * @param argument
+     *            the argument of the operation
+     * @param value
+     *            the value to represent
+     * @param fallback
+     *            the fallback supplier. It must not be {@code null}.
+     *
+     * @return an instance that represents the specified value
+     */
+    static <T> AdaptationResult<T> of(Object argument, T value, Supplier<? extends T> fallback) {
+        return new DefaultAdaptationResult<>(argument, value, fallback);
+    }
+
+    /**
+     * Returns an instance that represents the specified value without any
+     * fallback.
+     *
      * @param argument
      *            the argument of the operation
      * @param value
      *            the value to represent
      *
+     * @param <T>
+     *            the type of resulting values
+     *
      * @return an instance that represents the specified value
      */
-    static <T> AdaptationResult<T> of(AdaptationStrategy<T> operation, Object argument, T value) {
-        return new DefaultAdaptationResult<>(operation, argument, value);
+    static <T> AdaptationResult<T> of(Object argument, T value) {
+        return new ImmediateAdaptationResult<>(argument, value);
     }
 }
 
 /**
- * The default implementation for {@link AdaptationResult}.
+ * The base class for default implementations of {@link AdaptationResult}.
  *
  * @param <T>
  *            the type of the represented value
  */
-final class DefaultAdaptationResult<T> implements AdaptationResult<T> {
+abstract class AbstractAdaptationResult<T> implements AdaptationResult<T> {
 
-    /** Operation that has been executed. */
-    private final AdaptationStrategy<T> operation;
-    /** Argument of the operation. */
-    private final Object argument;
     /** Value to represent. */
     private final T value;
+    /** Argument of the operation. */
+    private final Object argument;
 
     /**
      * Creates a new instance.
      *
-     * @param strategy
-     *            the related operation. It must not be {@code null}.
      * @param arg
      *            the argument of the operation
      * @param val
      *            the value to represent
      */
-    public DefaultAdaptationResult(AdaptationStrategy<T> strategy, Object arg, T val) {
-        operation = Objects.requireNonNull(strategy);
+    protected AbstractAdaptationResult(Object arg, T val) {
         argument = arg;
         value = val;
     }
 
     /**
-     * @see net.yetamine.sova.adaptation.AdaptationResult#operation()
-     */
-    public AdaptationStrategy<T> operation() {
-        return operation;
-    }
-
-    /**
      * @see net.yetamine.sova.adaptation.AdaptationResult#argument()
      */
-    public Object argument() {
+    public final Object argument() {
         return argument;
     }
 
     /**
      * @see net.yetamine.sova.adaptation.AdaptationResult#get()
      */
-    public T get() {
+    public final T get() {
         return value;
+    }
+}
+
+/**
+ * The default implementation for {@link AdaptationResult} that handles the
+ * fallback case.
+ *
+ * @param <T>
+ *            the type of the represented value
+ */
+final class DefaultAdaptationResult<T> extends AbstractAdaptationResult<T> {
+
+    /** Fallback supplier. */
+    private final Supplier<? extends T> fallback;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param arg
+     *            the argument of the operation
+     * @param val
+     *            the value to represent
+     * @param supplier
+     *            the fallback supplier. It must not be {@code null}.
+     */
+    public DefaultAdaptationResult(Object arg, T val, Supplier<? extends T> supplier) {
+        super(arg, val);
+        fallback = Objects.requireNonNull(supplier);
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String.format("AdaptationResult[result=%s, argument=%s, fallback=present]", get(), argument());
+    }
+
+    /**
+     * @see net.yetamine.sova.adaptation.AdaptationResult#fallback()
+     */
+    public AdaptationResult<T> fallback() {
+        return new FallbackAdaptationResult<>(argument(), fallback.get());
+    }
+}
+
+/**
+ * The default implementation for {@link AdaptationResult} that can't handle any
+ * fallback.
+ *
+ * @param <T>
+ *            the type of the represented value
+ */
+final class ImmediateAdaptationResult<T> extends AbstractAdaptationResult<T> {
+
+    /**
+     * Creates a new instance.
+     *
+     * @param arg
+     *            the argument of the operation
+     * @param val
+     *            the value to represent
+     */
+    public ImmediateAdaptationResult(Object arg, T val) {
+        super(arg, val);
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String.format("AdaptationResult[result=%s, argument=%s, fallback=absent]", get(), argument());
+    }
+
+    /**
+     * @see net.yetamine.sova.adaptation.AdaptationResult#fallback()
+     */
+    public AdaptationResult<T> fallback() {
+        return new FallbackAdaptationResult<>(argument(), null);
+    }
+}
+
+/**
+ * The default implementation for {@link AdaptationResult} that handles just the
+ * fallback.
+ *
+ * @param <T>
+ *            the type of the represented value
+ */
+final class FallbackAdaptationResult<T> extends AbstractAdaptationResult<T> {
+
+    /**
+     * Creates a new instance.
+     *
+     * @param arg
+     *            the argument of the operation
+     * @param val
+     *            the value to represent
+     */
+    public FallbackAdaptationResult(Object arg, T val) {
+        super(arg, val);
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String.format("AdaptationResult[result=%s, argument=%s, fallback=this]", get(), argument());
+    }
+
+    /**
+     * @see net.yetamine.sova.adaptation.AdaptationResult#fallback()
+     */
+    public AdaptationResult<T> fallback() {
+        return this;
     }
 }

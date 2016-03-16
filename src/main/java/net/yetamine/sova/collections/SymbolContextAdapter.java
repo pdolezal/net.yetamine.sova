@@ -86,7 +86,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      * @see net.yetamine.sova.collections.SymbolContext#remove(net.yetamine.sova.adaptation.Mappable)
      */
     public <T> T remove(Mappable<?, T> symbol) {
-        return symbol.treat(storage().remove(symbol.remap()));
+        return symbol.derive(storage().remove(symbol.remap()));
     }
 
     /**
@@ -103,7 +103,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      */
     public <T> T put(Mappable<?, T> symbol, T value) {
         final T item = symbol.adapt(value).request();
-        return symbol.treat(storage().put(symbol.remap(), item));
+        return symbol.derive(storage().put(symbol.remap(), item));
     }
 
     /**
@@ -119,7 +119,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
         });
 
         // Verify that the result is either null, or is equal to what the adaptation would return
-        assert (result == null) || result.equals(symbol.treat(result));
+        assert (result == null) || result.equals(symbol.derive(result));
         return result;
     }
 
@@ -137,7 +137,7 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
      */
     public <T> T replace(Mappable<?, T> symbol, T value) {
         final T item = symbol.adapt(value).request();
-        return symbol.treat(storage().replace(symbol.remap(), item));
+        return symbol.derive(storage().replace(symbol.remap(), item));
     }
 
     /**
@@ -148,12 +148,12 @@ public abstract class SymbolContextAdapter extends SymbolMappingAdapter implemen
         final T item = symbol.adapt(value).request();
 
         final Object result = storage().merge(symbol.remap(), item, (u, v) -> {
-            final T current = symbol.treat(v);
+            final T current = symbol.derive(v);
             final T replace = remapping.apply(item, current);
             return symbol.adapt(replace).request();
         });
 
-        return symbol.treat(result);
+        return symbol.derive(result);
     }
 
     /**

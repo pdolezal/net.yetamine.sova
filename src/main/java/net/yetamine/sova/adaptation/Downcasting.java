@@ -70,6 +70,8 @@ public final class Downcasting<T> implements AdaptationProvider<T> {
         rtti = type;
     }
 
+    // Core methods
+
     /**
      * @see net.yetamine.sova.adaptation.AdaptationStrategy#adaptation()
      */
@@ -91,66 +93,7 @@ public final class Downcasting<T> implements AdaptationProvider<T> {
         return rtti;
     }
 
-    /**
-     * Creates a new instance using the specified value as the fallback result.
-     *
-     * @param value
-     *            the fallback value for the new instance. The value must be (at
-     *            least effectively) immutable, or {@code null}.
-     *
-     * @return the new instance
-     */
-    public Downcasting<T> fallbackTo(T value) {
-        return new Downcasting<>(rtti, adaptation, () -> value);
-    }
-
-    /**
-     * Creates a new instance using the specified fallback.
-     *
-     * @param value
-     *            the fallback for the new instance. It must not be {@code null}
-     *            and it must be consistent with all requirements imposed by the
-     *            adaptation derived from the type.
-     *
-     * @return the new instance
-     */
-    public Downcasting<T> fallback(Supplier<? extends T> value) {
-        return new Downcasting<>(rtti, adaptation, value);
-    }
-
-    /**
-     * Downcasts the given object to the specified type.
-     *
-     * @param <T>
-     *            the type of resulting values
-     * @param t
-     *            the class of the type to downcast the object to. It must not
-     *            be {@code null}.
-     * @param o
-     *            the object to adapt
-     *
-     * @return the object downcast to the specified type, or {@code null} if the
-     *         object is not an instance of the specified type
-     */
-    public static <T> T apply(Class<T> t, Object o) {
-        return t.isInstance(o) ? t.cast(o) : null;
-    }
-
-    /**
-     * Returns an adaptation that downcasts to the specified type.
-     *
-     * @param <T>
-     *            the type of resulting values
-     * @param t
-     *            the class of the type that the adaptation shall downcast its
-     *            arguments to. It must not be {@code null}.
-     *
-     * @return an adaptation that downcasts to the specified type
-     */
-    public static <T> Adaptation<T> adaptation(Class<T> t) {
-        Objects.requireNonNull(t);
-        return o -> apply(t, o);
-    }
+    // Factory methods
 
     /**
      * Creates a new instance.
@@ -242,6 +185,71 @@ public final class Downcasting<T> implements AdaptationProvider<T> {
      */
     public static <T> Downcasting<T> withFallbackTo(Class<T> t, T f) {
         return withFallback(t, () -> f);
+    }
+
+    // Builder-like interface
+
+    /**
+     * Creates a new instance using the specified value as the fallback result.
+     *
+     * @param value
+     *            the fallback value for the new instance. The value must be (at
+     *            least effectively) immutable, or {@code null}.
+     *
+     * @return the new instance
+     */
+    public Downcasting<T> fallbackTo(T value) {
+        return new Downcasting<>(rtti, adaptation, () -> value);
+    }
+
+    /**
+     * Creates a new instance using the specified fallback.
+     *
+     * @param value
+     *            the fallback for the new instance. It must not be {@code null}
+     *            and it must be consistent with all requirements imposed by the
+     *            adaptation derived from the type.
+     *
+     * @return the new instance
+     */
+    public Downcasting<T> fallback(Supplier<? extends T> value) {
+        return new Downcasting<>(rtti, adaptation, value);
+    }
+
+    // Supportive casting methods
+
+    /**
+     * Returns an adaptation that downcasts to the specified type.
+     *
+     * @param <T>
+     *            the type of resulting values
+     * @param t
+     *            the class of the type that the adaptation shall downcast its
+     *            arguments to. It must not be {@code null}.
+     *
+     * @return an adaptation that downcasts to the specified type
+     */
+    public static <T> Adaptation<T> adaptation(Class<T> t) {
+        Objects.requireNonNull(t);
+        return o -> apply(t, o);
+    }
+
+    /**
+     * Downcasts the given object to the specified type.
+     *
+     * @param <T>
+     *            the type of resulting values
+     * @param t
+     *            the class of the type to downcast the object to. It must not
+     *            be {@code null}.
+     * @param o
+     *            the object to adapt
+     *
+     * @return the object downcast to the specified type, or {@code null} if the
+     *         object is not an instance of the specified type
+     */
+    public static <T> T apply(Class<T> t, Object o) {
+        return t.isInstance(o) ? t.cast(o) : null;
     }
 
     /**
