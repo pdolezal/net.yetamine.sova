@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import net.yetamine.sova.adaptation.AdaptationResult;
 import net.yetamine.sova.adaptation.Mappable;
@@ -87,6 +88,16 @@ public final class LayeringSymbolSource implements SymbolSource {
 
         iterable.forEach(Objects::requireNonNull);
         return new LayeringSymbolSource(iterable);
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringJoiner result = new StringJoiner(", ", "[", "]");
+        sources.forEach(s -> result.add(s.toString()));
+        return result.toString();
     }
 
     /**
