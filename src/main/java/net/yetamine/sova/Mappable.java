@@ -153,6 +153,66 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
     }
 
     /**
+     * Returns an adapted value from the source, or the default.
+     *
+     * <p>
+     * If the source does not provide an adaptable argument, the default is used
+     * and the sink receives it. The sink is not invoked when the default is not
+     * used.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     * @param sink
+     *            the sink to store the default if the source fails. It must not
+     *            be {@code null}.
+     *
+     * @return the result of the adaptation, or the default
+     */
+    default V let(Function<? super K, ?> source, BiConsumer<? super K, ? super V> sink) {
+        final K mapping = remap();
+        final V result = derive(source.apply(mapping));
+        if (result != null) {
+            return result;
+        }
+
+        final V fallback = fallback().get();
+        sink.accept(mapping, fallback);
+        return fallback;
+    }
+
+    /**
+     * Returns an adapted value from the source, or the default.
+     *
+     * <p>
+     * If the source provides no argument, the default is used and the sink
+     * receives it. The sink is not invoked when the default is not used. This
+     * method does not call the sink, unlike {@link #let(Function, BiConsumer)},
+     * if the source provides an argument that can't be adapted though.
+     *
+     * @param source
+     *            the source of the argument to adapt. It must not be
+     *            {@code null}.
+     * @param sink
+     *            the sink to store the default if the source fails. It must not
+     *            be {@code null}.
+     *
+     * @return the result of the adaptation, or the default; an empty container
+     *         is returned if no default exists
+     */
+    default Optional<V> have(Function<? super K, ?> source, BiConsumer<? super K, ? super V> sink) {
+        final K mapping = remap();
+        final Object result = source.apply(mapping);
+        if (result != null) { // Do not invoke the sink then!
+            return Optional.ofNullable(derive(result));
+        }
+
+        final Optional<V> fallback = Optional.ofNullable(fallback().get());
+        fallback.ifPresent(value -> sink.accept(mapping, value));
+        return fallback;
+    }
+
+    /**
      * Transfers the given value to the given consumer.
      *
      * @param consumer
@@ -266,29 +326,30 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * Returns an adapted value from the source, or the default; the returned
      * value should be stored in the source.
      *
-     * @param source
-     *            the source of the argument to adapt and possibly to store the
-     *            default. It must not be {@code null}.
+     * @param map
+     *            the map to provide the argument to adapt and possibly to store
+     *            the default. It must not be {@code null}.
      *
      * @return the result of the adaptation, or the default
      */
-    default V let(Map<K, V> source) {
-        return derive(source.compute(remap(), (k, v) -> recover(v)));
+    default V let(Map<K, V> map) {
+        return derive(map.compute(remap(), (k, v) -> recover(v)));
     }
 
     /**
      * Puts the default to the given map if the mapping is absent, otherwise
      * tries to use the present mapping to get the result.
      *
-     * @param consumer
-     *            the map to accept the {@link #remap()} result and the default
-     *            value. It must not be {@code null}.
+     * @param map
+     *            the map to provide the argument to adapt and possibly to store
+     *            the default. It must not be {@code null}.
      *
      * @return the result of {@link Map#computeIfAbsent(Object, Function)} after
-     *         adapting; an empty container is returned if no default exists, so
-     *         that the caller may handle the situation accordingly
+     *         adapting; an empty container is returned if the result could not
+     *         be adapted (either the existing value can't be adapted, or there
+     *         is no default)
      */
-    default Optional<V> have(Map<? super K, V> consumer) {
-        return Optional.ofNullable(consumer.computeIfAbsent(remap(), k -> fallback().get()));
+    default Optional<V> have(Map<? super K, V> map) {
+        return Optional.ofNullable(map.computeIfAbsent(remap(), k -> fallback().get()));
     }
 }
