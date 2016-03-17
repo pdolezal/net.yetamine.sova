@@ -37,8 +37,8 @@ public final class DefaultMappable<K, V> implements Mappable<K, V> {
      * only {@code null} results which are compatible with any type, therefore
      * the instance can be used for any generic types.
      */
-    static final Mappable<Object, Object> NULL // @formatter:break
-    = new DefaultMappable<>(Downcasting.withFilter(Object.class, o -> false), () -> null);
+    static final Mappable<Object, Object> NULL = new DefaultMappable<>( // @formatter:break
+            Downcasting.withFilter(Object.class, o -> false), () -> null);
 
     /** Implementation of the adaptation part. */
     private final AdaptationProvider<V> provider;
