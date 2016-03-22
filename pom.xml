@@ -71,7 +71,8 @@
         <dependency>
             <groupId>net.yetamine</groupId>
             <artifactId>net.yetamine.lang</artifactId>
-            <version>1.0.0</version>
+            <!-- Working with snapshot/1.0.0/20160410 -->
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
