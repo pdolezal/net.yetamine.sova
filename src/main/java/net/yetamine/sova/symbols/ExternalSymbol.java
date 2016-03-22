@@ -54,8 +54,8 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
 
     /** Identifier of this instance. */
     private final I identifier;
-    /** Cached {@link #surrogate()}. */
-    private Mappable<I, V> surrogate;
+    /** Cached {@link #substitute()}. */
+    private Mappable<I, V> substitute;
 
     /**
      * Creates a new instance.
@@ -108,19 +108,19 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
     }
 
     /**
-     * @see net.yetamine.sova.symbols.PublicSymbol#surrogate()
+     * @see net.yetamine.sova.symbols.PublicSymbol#substitute()
      */
-    public final Mappable<I, V> surrogate() {
+    public final Mappable<I, V> substitute() {
         // Using caching technique that uses out-of-thin air thread safety;
         // this technique is alright here, because the instances are always
         // behaving in the same way, therefore they are interchangeable
-        Mappable<I, V> result = surrogate;
+        Mappable<I, V> result = substitute;
         if (result != null) {
             return result;
         }
 
-        result = PublicSymbol.super.surrogate();
-        surrogate = result;
+        result = PublicSymbol.super.substitute();
+        substitute = result;
         return result;
     }
 

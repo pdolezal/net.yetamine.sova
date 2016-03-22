@@ -17,6 +17,7 @@
 package net.yetamine.sova.symbols;
 
 import net.yetamine.sova.Mappable;
+import net.yetamine.sova.Substitutable;
 import net.yetamine.sova.Symbol;
 
 /**
@@ -41,7 +42,7 @@ import net.yetamine.sova.Symbol;
  * @param <V>
  *            the type of resulting values
  */
-public interface PublicSymbol<I, V> extends Symbol<V> {
+public interface PublicSymbol<I, V> extends Symbol<V>, Substitutable<Mappable<I, V>> {
 
     // Equality definition
 
@@ -131,12 +132,12 @@ public interface PublicSymbol<I, V> extends Symbol<V> {
     I identifier();
 
     /**
-     * Returns the surrogate mapping implementation that uses the identifier
-     * instead of self.
+     * Returns a substitute implementation that uses the identifier instead of
+     * self.
      *
-     * @return the surrogate mapping implementation
+     * @see net.yetamine.sova.Substitutable#substitute()
      */
-    default Mappable<I, V> surrogate() {
+    default Mappable<I, V> substitute() {
         return Mappable.of(identifier(), this);
     }
 }
