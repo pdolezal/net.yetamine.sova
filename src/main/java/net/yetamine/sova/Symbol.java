@@ -38,7 +38,7 @@ public interface Symbol<T> extends Mappable<Symbol<T>, T> {
      * must always return {@code this} even then. Overriding, however, can't be
      * recommended much as it may impose some overhead and is rarely necessary.
      *
-     * @return {@code this}
+     * @return {@code this} instance
      *
      * @see net.yetamine.sova.Mappable#remap()
      */
