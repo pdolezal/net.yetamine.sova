@@ -16,7 +16,6 @@
 
 package net.yetamine.sova.symbols;
 
-import net.yetamine.sova.DefaultMappable;
 import net.yetamine.sova.Mappable;
 import net.yetamine.sova.Symbol;
 
@@ -138,6 +137,6 @@ public interface PublicSymbol<I, V> extends Symbol<V> {
      * @return the surrogate mapping implementation
      */
     default Mappable<I, V> surrogate() {
-        return new DefaultMappable<>(this, this::identifier);
+        return Mappable.of(identifier(), this);
     }
 }

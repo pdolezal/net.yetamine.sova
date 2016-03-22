@@ -17,9 +17,11 @@
 package net.yetamine.sova;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * An adaptation strategy that can remap self to a different type and/or object.
@@ -70,6 +72,45 @@ import java.util.function.Function;
 public interface Mappable<K, V> extends AdaptationStrategy<V> {
 
     /**
+     * Returns an instance that uses a {@link Supplier} for {@link #remap()}
+     * evaluation and the given {@link AdaptationProvider} as the adaptation
+     * implementation.
+     *
+     * @param <K>
+     *            the type of the mappable key
+     * @param <V>
+     *            the type of resulting values
+     * @param mapping
+     *            the mapping supplier. It must not be {@code null}.
+     * @param provider
+     *            the adaptation implementation. It must not be {@code null}.
+     *
+     * @return the instance
+     */
+    static <K, V> Mappable<K, V> bind(Supplier<? extends K> mapping, AdaptationProvider<V> provider) {
+        return new SupplyingMappable<>(mapping, provider);
+    }
+
+    /**
+     * Returns an instance that uses the given constant for {@link #remap()} and
+     * the given {@link AdaptationProvider} as the adaptation implementation.
+     *
+     * @param <K>
+     *            the type of the mappable key
+     * @param <V>
+     *            the type of resulting values
+     * @param mapping
+     *            the mapping result
+     * @param provider
+     *            the adaptation implementation. It must not be {@code null}.
+     *
+     * @return the instance
+     */
+    static <K, V> Mappable<K, V> of(K mapping, AdaptationProvider<V> provider) {
+        return new ConstantMappable<>(mapping, provider);
+    }
+
+    /**
      * Returns an instance that adapts anything to {@code null}, provides only
      * {@code null} as the fallback and returns {@code null} mapping.
      *
@@ -80,10 +121,11 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      *
      * @return an instance that reduces anything to {@code null}
      */
-    @SuppressWarnings("unchecked")
-    static <K, V> Mappable<K, V> nullified() {
-        return (Mappable<K, V>) DefaultMappable.NULL;
+    static <K, V> Mappable<K, V> nil() {
+        return NilMappable.getInstance();
     }
+
+    // Interface core
 
     /**
      * Remap this instance to a specific key.
@@ -351,5 +393,173 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      */
     default Optional<V> have(Map<? super K, V> map) {
         return Optional.ofNullable(map.computeIfAbsent(remap(), k -> fallback().get()));
+    }
+}
+
+/**
+ * Implementation of {@link Mappable#nil()} result.
+ */
+enum NilMappable implements Mappable<Object, Object> {
+
+    /** Sole instance of this implementation. */
+    INSTANCE;
+
+    /**
+     * Returns a properly cast instance.
+     *
+     * @param <K>
+     *            the type of the remapping result
+     * @param <V>
+     *            the type of resulting values
+     *
+     * @return the instance
+     */
+    @SuppressWarnings("unchecked")
+    public static <K, V> Mappable<K, V> getInstance() {
+        return (Mappable<K, V>) INSTANCE;
+    }
+
+    /**
+     * @see net.yetamine.sova.AdaptationProvider#adaptation()
+     */
+    public Adaptation<Object> adaptation() {
+        return o -> null;
+    }
+
+    /**
+     * @see net.yetamine.sova.AdaptationProvider#fallback()
+     */
+    public Supplier<? extends Object> fallback() {
+        return () -> null;
+    }
+
+    /**
+     * @see net.yetamine.sova.AdaptationProvider#rtti()
+     */
+    public Class<Object> rtti() {
+        return null;
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#remap()
+     */
+    public Object remap() {
+        return null;
+    }
+}
+
+/**
+ * A implementation of the {@link Mappable} interface whose {@link #remap()}
+ * implementation returns a constant.
+ *
+ * @param <K>
+ *            the type of the mappable key
+ * @param <V>
+ *            the type of resulting values
+ */
+final class ConstantMappable<K, V> implements Mappable<K, V> {
+
+    /** Implementation of the adaptation part. */
+    private final AdaptationProvider<V> provider;
+    /** Result of {@link #remap()}. */
+    private final K remapping;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param implementation
+     *            the adaptation implementation. It must not be {@code null}.
+     * @param mapping
+     *            the mappable supplier. It must not be {@code null}.
+     */
+    public ConstantMappable(K mapping, AdaptationProvider<V> implementation) {
+        provider = Objects.requireNonNull(implementation);
+        remapping = mapping;
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#remap()
+     */
+    public K remap() {
+        return remapping;
+    }
+
+    /**
+     * @see net.yetamine.sova.AdaptationStrategy#adaptation()
+     */
+    public Adaptation<V> adaptation() {
+        return provider.adaptation();
+    }
+
+    /**
+     * @see net.yetamine.sova.AdaptationProvider#fallback()
+     */
+    public Supplier<? extends V> fallback() {
+        return provider.fallback();
+    }
+
+    /**
+     * @see net.yetamine.sova.AdaptationStrategy#rtti()
+     */
+    public Class<V> rtti() {
+        return provider.rtti();
+    }
+}
+
+/**
+ * A implementation of the {@link Mappable} interface which uses a
+ * {@link Supplier} for {@link #remap()} implementation.
+ *
+ * @param <K>
+ *            the type of the mappable key
+ * @param <V>
+ *            the type of resulting values
+ */
+final class SupplyingMappable<K, V> implements Mappable<K, V> {
+
+    /** Implementation of the adaptation part. */
+    private final AdaptationProvider<V> provider;
+    /** Supplier of the remapping values. */
+    private final Supplier<? extends K> remapping;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param mapping
+     *            the mappable supplier. It must not be {@code null}.
+     * @param implementation
+     *            the adaptation implementation. It must not be {@code null}.
+     */
+    public SupplyingMappable(Supplier<? extends K> mapping, AdaptationProvider<V> implementation) {
+        provider = Objects.requireNonNull(implementation);
+        remapping = Objects.requireNonNull(mapping);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#remap()
+     */
+    public K remap() {
+        return remapping.get();
+    }
+
+    /**
+     * @see net.yetamine.sova.AdaptationStrategy#adaptation()
+     */
+    public Adaptation<V> adaptation() {
+        return provider.adaptation();
+    }
+
+    /**
+     * @see net.yetamine.sova.AdaptationProvider#fallback()
+     */
+    public Supplier<? extends V> fallback() {
+        return provider.fallback();
+    }
+
+    /**
+     * @see net.yetamine.sova.AdaptationStrategy#rtti()
+     */
+    public Class<V> rtti() {
+        return provider.rtti();
     }
 }
