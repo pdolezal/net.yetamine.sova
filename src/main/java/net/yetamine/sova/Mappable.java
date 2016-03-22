@@ -136,6 +136,16 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      * must have properly implemented and well-defined equality to be usable as
      * keys.
      *
+     * <p>
+     * This method for equal instances has to return equal values (in the terms
+     * of {@link Object#equals(Object)}). However, equal results of this method
+     * do not imply that the instances must be equal, although within a given
+     * context such an implication, in a weak form, might be practically valid,
+     * e.g., when a well-known key with well-defined semantics within a library
+     * or context is used, binding an instance to such a key assumes that the
+     * semantics the key is honored and all instances bound to the key behave
+     * basically in the same way.
+     *
      * @return the key for this instance, which should never be {@code null}
      */
     K remap();
