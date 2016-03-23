@@ -384,7 +384,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      *
      * @return the result of the adaptation, or the default
      */
-    default V let(Map<K, V> map) {
+    default V let(Map<? super K, ? super V> map) {
         return derive(map.compute(remap(), (k, v) -> recover(v)));
     }
 
@@ -401,8 +401,8 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      *         be adapted (either the existing value can't be adapted, or there
      *         is no default)
      */
-    default Optional<V> have(Map<? super K, V> map) {
-        return Optional.ofNullable(map.computeIfAbsent(remap(), k -> fallback().get()));
+    default Optional<V> have(Map<? super K, ? super V> map) {
+        return Optional.ofNullable(derive(map.computeIfAbsent(remap(), k -> fallback().get())));
     }
 }
 
