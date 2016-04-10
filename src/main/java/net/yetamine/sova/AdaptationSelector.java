@@ -17,9 +17,10 @@
 package net.yetamine.sova;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import net.yetamine.lang.introspective.Adaptable;
 
 /**
  * An adaptation provider that is based on {@link Adaptable}.
@@ -186,28 +187,6 @@ public final class AdaptationSelector<T> extends AdaptationDelegate<T> {
      */
     public static <T> Adaptation<T> adaptation(Class<T> t) {
         Objects.requireNonNull(t);
-        return o -> Optional.ofNullable(o)              // Adaptable uses Optional, unify the handling
-                .filter(a -> a instanceof Adaptable)    // The actual argument does not have to be an Adaptable
-                .flatMap(a -> ((Adaptable) a).adapt(t)) // Adapt if it is
-                .orElse(null);
-    }
-
-    /**
-     * Adapts the given object to the specified type.
-     *
-     * @param <T>
-     *            the type of resulting values
-     * @param t
-     *            the class of the type to adapt the object to. It must not be
-     *            {@code null}.
-     * @param o
-     *            the object to adapt
-     *
-     * @return the object adapted to the specified type, or {@code null} if the
-     *         object is not an instance of {@link Adaptable} or does not allow
-     *         the required adaptation
-     */
-    public static <T> T apply(Class<T> t, Adaptable o) {
-        return Optional.ofNullable(o).flatMap(a -> a.adapt(t)).orElse(null);
+        return o -> Adaptable.adapt(t, o).orElse(null);
     }
 }
