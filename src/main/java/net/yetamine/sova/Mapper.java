@@ -19,8 +19,8 @@ package net.yetamine.sova;
 import java.util.Optional;
 
 /**
- * An extension of {@link Mapping} which allows to implement it atop of a
- * generic mapping function.
+ * An extension of {@link Mapping}, turning it into a functional interface,
+ * which allows to implement it just with a simple mapping function.
  */
 @FunctionalInterface
 public interface Mapper extends Mapping {
@@ -39,31 +39,31 @@ public interface Mapper extends Mapping {
     Object map(Object key);
 
     /**
+     * @see net.yetamine.sova.Mapping#contains(net.yetamine.sova.Mappable)
+     */
+    default boolean contains(Mappable<?, ?> ref) {
+        return (get(ref) != null);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mapping#find(net.yetamine.sova.Mappable)
+     */
+    default <R> Optional<R> find(Mappable<?, R> ref) {
+        return ref.optional(map(ref.remap()));
+    }
+
+    /**
      * @see net.yetamine.sova.Mapping#get(net.yetamine.sova.Mappable)
      */
-    default <R> R get(Mappable<?, R> symbol) {
-        return symbol.derive(map(symbol.remap()));
+    default <R> R get(Mappable<?, R> ref) {
+        return ref.nullable(map(ref.remap()));
     }
 
     /**
      * @see net.yetamine.sova.Mapping#use(net.yetamine.sova.Mappable)
      */
     default <R> R use(Mappable<?, R> symbol) {
-        return symbol.recover(map(symbol.remap()));
-    }
-
-    /**
-     * @see net.yetamine.sova.Mapping#find(net.yetamine.sova.Mappable)
-     */
-    default <R> Optional<R> find(Mappable<?, R> symbol) {
-        return symbol.resolve(map(symbol.remap()));
-    }
-
-    /**
-     * @see net.yetamine.sova.Mapping#contains(net.yetamine.sova.Mappable)
-     */
-    default boolean contains(Mappable<?, ?> symbol) {
-        return (map(symbol.remap()) != null);
+        return symbol.surrogate(map(symbol.remap()));
     }
 
     /**

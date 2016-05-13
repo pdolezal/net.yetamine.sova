@@ -18,7 +18,6 @@ package net.yetamine.sova;
 
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Represents an adaptation strategy that provides the adaptation function and a
@@ -58,80 +57,62 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
      * @return an object for retrieving the result of the adaptation
      */
     default AdaptationResult<T> adapt(Object o) {
-        return AdaptationResult.of(o, derive(o), this);
+        return AdaptationResult.of(o, nullable(o), this);
     }
 
     // Convenient application methods
 
     /**
-     * Returns the result of the adaptation of the given argument; this method
-     * is a shortcut for {@code adaptation().apply(o)}.
+     * Returns the adaptation of the given argument; this method is a shortcut
+     * for {@code adaptation().apply(o)} and therefore returns the most direct
+     * result of the adaptation which may be {@code null} if the argument is
+     * {@code null} or could not be adapted.
      *
      * @param o
      *            the argument to adapt
      *
-     * @return the result of the adaptation, or {@code null} if the argument is
-     *         {@code null} or could not be adapted
+     * @return the result of the adaptation of the given argument, possibly
+     *         {@code null} if the argument is {@code null} or could not be
+     *         adapted
      */
-    default T derive(Object o) {
+    default T nullable(Object o) {
         return adaptation().apply(o);
     }
 
     /**
-     * Returns the default value if the argument is {@code null}, otherwise the
-     * argument.
-     *
-     * @param o
-     *            the object to check
-     * @param f
-     *            the fallback to use. It must not be {@code null}.
-     *
-     * @return the given object, or the default value
-     */
-    default T fallback(T o, Supplier<? extends T> f) {
-        return (o != null) ? o : f.get();
-    }
-
-    /**
-     * Returns the default value if the argument is {@code null}, otherwise the
-     * argument.
-     *
-     * @param o
-     *            the object to check
-     *
-     * @return the given object, or the default value
-     */
-    default T fallback(T o) {
-        return fallback(o, fallback());
-    }
-
-    /**
-     * Returns the result of the adaptation of the given argument or the default
-     * value; this method is a shortcut for {@code fallback(apply(o))}.
+     * Returns the result of {@link #nullable(Object)} as an {@link Optional}.
      *
      * @param o
      *            the argument to adapt
      *
-     * @return the result of the adaptation or the default value; {@code null}
-     *         is returned if neither the adaptation nor the fallback provided a
-     *         valid object
+     * @return the result of {@link #nullable(Object)} as an {@link Optional}
      */
-    default T recover(Object o) {
-        return fallback(derive(o));
+    default Optional<T> optional(Object o) {
+        return Optional.ofNullable(nullable(o));
     }
 
     /**
-     * Returns an {@link Optional} instance representing the result of the
-     * adaptation of the given argument or the fallback; this method is a
-     * shortcut for {@code Optional.ofNullable(recover(o))}.
+     * Returns the adaptation of the given argument, or the fallback if the
+     * argument is {@code null} or could not be adapted, which still may be
+     * {@code null} if no better fallback exists.
      *
      * @param o
      *            the argument to adapt
      *
-     * @return the result of the adaptation or the fallback
+     * @return the result of the adaptation of the given argument, or the
+     *         fallback if the argument is {@code null} or could not be adapted;
+     *         {@code null} may be returned if the fallback strategy returns it
      */
-    default Optional<T> resolve(Object o) {
-        return Optional.ofNullable(recover(o));
+    default T surrogate(Object o) {
+        final T result = nullable(o);
+        if (result != null) {
+            return result;
+        }
+
+        // Fallback should be consistent!
+        final T fallback = fallback().get();
+        assert ((fallback == null) || (nullable(fallback) != null));
+        return fallback;
     }
 
     // Interoperability support

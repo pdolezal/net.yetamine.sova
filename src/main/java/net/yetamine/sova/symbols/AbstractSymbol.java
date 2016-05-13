@@ -69,6 +69,7 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     /**
      * @see net.yetamine.lang.introspective.Introspection#introspect()
      */
+    @Override
     public final Map<?, ?> introspect() {
         final Map<Object, Object> result = new LinkedHashMap<>();
         introspect(result);
@@ -76,44 +77,33 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.AdaptationStrategy#derive(java.lang.Object)
+     * @see net.yetamine.sova.AdaptationStrategy#nullable(java.lang.Object)
      */
-    public final T derive(Object o) {
-        return Symbol.super.derive(o);
+    @Override
+    public final T nullable(Object o) {
+        return Symbol.super.nullable(o);
     }
 
     /**
-     * @see net.yetamine.sova.AdaptationStrategy#recover(java.lang.Object)
+     * @see net.yetamine.sova.AdaptationStrategy#optional(java.lang.Object)
      */
-    public final T recover(Object o) {
-        return Symbol.super.recover(o);
+    @Override
+    public final Optional<T> optional(Object o) {
+        return Symbol.super.optional(o);
     }
 
     /**
-     * @see net.yetamine.sova.AdaptationStrategy#resolve(java.lang.Object)
+     * @see net.yetamine.sova.AdaptationStrategy#surrogate(java.lang.Object)
      */
-    public final Optional<T> resolve(Object o) {
-        return Symbol.super.resolve(o);
-    }
-
-    /**
-     * @see net.yetamine.sova.AdaptationStrategy#fallback(java.lang.Object,
-     *      java.util.function.Supplier)
-     */
-    public final T fallback(T o, Supplier<? extends T> f) {
-        return Symbol.super.fallback(o, f);
-    }
-
-    /**
-     * @see net.yetamine.sova.AdaptationStrategy#fallback(java.lang.Object)
-     */
-    public final T fallback(T o) {
-        return Symbol.super.fallback(o);
+    @Override
+    public final T surrogate(Object o) {
+        return Symbol.super.surrogate(o);
     }
 
     /**
      * @see net.yetamine.sova.AdaptationStrategy#function()
      */
+    @Override
     public final Function<Object, AdaptationResult<T>> function() {
         return Symbol.super.function();
     }
@@ -121,8 +111,26 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     // Generic access methods
 
     /**
+     * @see net.yetamine.sova.Mappable#pull(java.util.function.Function)
+     */
+    @Override
+    public <R> R pull(Function<? super Symbol<T>, ? extends R> source) {
+        return Symbol.super.pull(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.symbols.AbstractSymbol#push(java.util.function.BiConsumer,
+     *      java.lang.Object)
+     */
+    @Override
+    public final void push(BiConsumer<? super Symbol<T>, ? super T> consumer, T value) {
+        Symbol.super.push(consumer, value);
+    }
+
+    /**
      * @see net.yetamine.sova.Mappable#get(java.util.function.Function)
      */
+    @Override
     public final T get(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.get(source);
     }
@@ -130,6 +138,7 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     /**
      * @see net.yetamine.sova.Mappable#use(java.util.function.Function)
      */
+    @Override
     public final T use(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.use(source);
     }
@@ -137,6 +146,7 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     /**
      * @see net.yetamine.sova.Mappable#find(java.util.function.Function)
      */
+    @Override
     public final Optional<T> find(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.find(source);
     }
@@ -144,6 +154,7 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     /**
      * @see net.yetamine.sova.Mappable#yield(java.util.function.Function)
      */
+    @Override
     public final AdaptationResult<T> yield(Function<? super Symbol<T>, ?> source) {
         return Symbol.super.yield(source);
     }
@@ -152,23 +163,33 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
      * @see net.yetamine.sova.Mappable#put(java.util.function.BiConsumer,
      *      java.lang.Object)
      */
-    public final void put(BiConsumer<? super Symbol<T>, ? super T> consumer, T value) {
-        consumer.accept(this, value);
-    }
-
-    /**
-     * @see net.yetamine.sova.Mappable#set(java.util.function.BiConsumer,
-     *      java.lang.Object)
-     */
-    public final void set(BiConsumer<? super Symbol<T>, ? super T> consumer, Object value) {
-        Symbol.super.set(consumer, value);
+    @Override
+    public final void put(BiConsumer<? super Symbol<T>, ? super T> consumer, Object value) {
+        Symbol.super.put(consumer, value);
     }
 
     // Map-based access methods
 
     /**
+     * @see net.yetamine.sova.Mappable#pull(java.util.Map)
+     */
+    @Override
+    public <R> R pull(Map<?, ? extends R> source) {
+        return Symbol.super.pull(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#push(java.util.Map, java.lang.Object)
+     */
+    @Override
+    public final Object push(Map<? super Symbol<T>, ? super T> consumer, T value) {
+        return Symbol.super.push(consumer, value);
+    }
+
+    /**
      * @see net.yetamine.sova.Mappable#get(java.util.Map)
      */
+    @Override
     public final T get(Map<?, ?> source) {
         return Symbol.super.get(source);
     }
@@ -176,6 +197,7 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     /**
      * @see net.yetamine.sova.Mappable#use(java.util.Map)
      */
+    @Override
     public final T use(Map<?, ?> source) {
         return Symbol.super.use(source);
     }
@@ -183,6 +205,7 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     /**
      * @see net.yetamine.sova.Mappable#find(java.util.Map)
      */
+    @Override
     public final Optional<T> find(Map<?, ?> source) {
         return Symbol.super.find(source);
     }
@@ -190,24 +213,26 @@ public abstract class AbstractSymbol<T> implements Introspection, Symbol<T> {
     /**
      * @see net.yetamine.sova.Mappable#yield(java.util.Map)
      */
+    @Override
     public final AdaptationResult<T> yield(Map<?, ?> source) {
         return Symbol.super.yield(source);
     }
 
     /**
-     * @see net.yetamine.sova.Mappable#put(java.util.Map,
-     *      java.lang.Object)
+     * @see net.yetamine.sova.Mappable#put(java.util.Map, java.lang.Object)
      */
-    public final Object put(Map<? super Symbol<T>, ? super T> consumer, T value) {
+    @Override
+    public final T put(Map<? super Symbol<T>, ? super T> consumer, Object value) {
         return Symbol.super.put(consumer, value);
     }
 
     /**
-     * @see net.yetamine.sova.Mappable#set(java.util.Map,
-     *      java.lang.Object)
+     * @see net.yetamine.sova.Mappable#supply(java.util.Map,
+     *      java.util.function.Supplier)
      */
-    public final Object set(Map<? super Symbol<T>, ? super T> consumer, Object value) {
-        return Symbol.super.set(consumer, value);
+    @Override
+    public T supply(Map<? super Symbol<T>, ? super T> map, Supplier<?> surrogate) {
+        return Symbol.super.supply(map, surrogate);
     }
 
     // Other stuff

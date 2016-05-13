@@ -19,19 +19,18 @@ package net.yetamine.sova;
 import java.util.Optional;
 
 /**
- * A function-like mapping from {@link Mappable} symbols to values that the
- * symbols are associated with and can adapt them to the desired form.
+ * An adaptive function-like mapping from {@link Mappable} references to values
+ * that the references are associated with.
  *
  * <p>
- * This structure does not support {@code null} values, although implementations
- * may tolerate them and even try to support them if {@link #contains(Mappable)}
- * does return {@code true} even for a {@code null} value. However, {@code null}
- * results should be rather interpreted as missing or invalid association.
+ * This structure does not support {@code null} values and {@code null} result
+ * means that the mapping to a valid adaptable result does not exist.
  *
  * <p>
- * Using {@code null} for the symbol arguments is prohibited (consistently with
- * prohibiting {@code null} values). When suitable or necessary, it is possible
- * to use {@link Mappable#nil()} as a surrogate for a {@code null} symbol.
+ * Using {@code null} for the reference arguments is prohibited (consistently
+ * with prohibiting {@code null} values). When suitable or necessary, it is
+ * possible to use {@link Mappable#nil()} as a surrogate for a {@code null}
+ * association reference.
  *
  * <p>
  * The interface is designed as read-only; however, changing the content might
@@ -41,75 +40,77 @@ import java.util.Optional;
 public interface Mapping {
 
     /**
-     * Returns {@code true} if a value associated with the given symbol exists.
+     * Returns {@code true} if a value associated with the given reference
+     * exists.
      *
-     * @param symbol
-     *            the symbol to test. It must not be {@code null}.
+     * @param ref
+     *            the reference to test. It must not be {@code null}.
      *
-     * @return {@code true} if a value associated with the given symbol exists
+     * @return {@code true} if a value associated with the given reference
+     *         exists
      */
-    boolean contains(Mappable<?, ?> symbol);
-
-    /**
-     * Returns the value associated with the given symbol, or {@code null} if no
-     * mapping for the symbol exists.
-     *
-     * @param <R>
-     *            the type of the result
-     * @param symbol
-     *            the symbol whose associated value is to be returned. It must
-     *            not be {@code null}.
-     *
-     * @return the value associated with the given symbol, or {@code null} if no
-     *         mapping for the symbol exists
-     */
-    <R> R get(Mappable<?, R> symbol);
-
-    /**
-     * Returns the value associated with the given symbol, or the default value
-     * for the symbol if no mapping for the symbol exists.
-     *
-     * @param <R>
-     *            the type of the result
-     * @param symbol
-     *            the symbol whose associated value is to be returned. It must
-     *            not be {@code null}.
-     *
-     * @return the value associated with the given symbol, or the default value
-     *         for the symbol if no mapping for the symbol exists
-     */
-    <R> R use(Mappable<?, R> symbol);
+    boolean contains(Mappable<?, ?> ref);
 
     /**
      * Returns an {@link Optional} with the value associated with the given
-     * symbol, or an empty container if no mapping for the symbol exists.
+     * reference, or an empty container if no mapping for the reference exists.
      *
      * @param <R>
      *            the type of the result
-     * @param symbol
-     *            the symbol whose associated value is to be returned. It must
-     *            not be {@code null}.
+     * @param ref
+     *            the reference whose associated value is to be returned. It
+     *            must not be {@code null}.
      *
      * @return an {@link Optional} containing the value associated with the
-     *         given symbol, or an empty container if no mapping for the symbol
-     *         exists
+     *         given reference, or an empty container if no mapping for the
+     *         reference exists
      */
-    <R> Optional<R> find(Mappable<?, R> symbol);
+    <R> Optional<R> find(Mappable<?, R> ref);
+
+    /**
+     * Returns the value associated with the given reference, or {@code null} if
+     * no mapping for the reference exists.
+     *
+     * @param <R>
+     *            the type of the result
+     * @param ref
+     *            the reference whose associated value is to be returned. It
+     *            must not be {@code null}.
+     *
+     * @return the value associated with the given reference, or {@code null} if
+     *         no mapping for the reference exists
+     */
+    <R> R get(Mappable<?, R> ref);
+
+    /**
+     * Returns the value associated with the given reference, or the default
+     * value for the reference if no mapping for the reference exists.
+     *
+     * @param <R>
+     *            the type of the result
+     * @param ref
+     *            the reference whose associated value is to be returned. It
+     *            must not be {@code null}.
+     *
+     * @return the value associated with the given reference, or the default
+     *         value for the reference if no mapping for the reference exists
+     */
+    <R> R use(Mappable<?, R> ref);
 
     /**
      * Returns an {@link AdaptationResult} describing the attempt to adapt the
-     * value associated to the given symbol with the symbol; the result allows
-     * querying the value or the fallback as well as other details of the
+     * value associated to the given reference with the reference; the result
+     * allows querying the value or the fallback as well as other details of the
      * operation.
      *
      * @param <R>
      *            the type of the result
-     * @param symbol
-     *            the symbol whose associated value is to be returned. It must
-     *            not be {@code null}.
+     * @param ref
+     *            the reference whose associated value is to be returned. It
+     *            must not be {@code null}.
      *
      * @return an {@link AdaptationResult} describing the attempt to adapt the
-     *         value associated to the given symbol with the symbol
+     *         value associated to the given reference with the reference
      */
-    <R> AdaptationResult<R> yield(Mappable<?, R> symbol);
+    <R> AdaptationResult<R> yield(Mappable<?, R> ref);
 }

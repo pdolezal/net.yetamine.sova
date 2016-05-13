@@ -150,7 +150,7 @@ public interface AdaptationResult<T> extends Supplier<T> {
      *
      * @return the result of {@link #get()} as an {@link Optional}
      */
-    default Optional<T> resolve() {
+    default Optional<T> optional() {
         return Optional.ofNullable(get());
     }
 
@@ -182,7 +182,7 @@ public interface AdaptationResult<T> extends Supplier<T> {
 
     /**
      * Returns an instance which represents either the same result as this
-     * instance, or the default value if the result is {@code null}.
+     * instance, or the fallback if the result is {@code null}.
      *
      * <p>
      * This method allows patterns like:
@@ -194,7 +194,7 @@ public interface AdaptationResult<T> extends Supplier<T> {
      * The previous code provides the same result as:
      *
      * <pre>
-     * adapted = Optional.ofNullable(adaptationStrategy.recover(adaptee)).orElseThrow(AdaptationException::new);
+     * adapted = Optional.ofNullable(adaptationStrategy.surrogate(adaptee)).orElseThrow(AdaptationException::new);
      * </pre>
      *
      * The former code is considerably more concise and clearer.
@@ -220,9 +220,8 @@ public interface AdaptationResult<T> extends Supplier<T> {
      *
      * @return an instance that represents the specified value
      */
-    static <T> AdaptationResult<T> of(Object argument, T value, AdaptationStrategy<T> operation) {
-        final Supplier<? extends T> fallback = operation.fallback();
-        return (fallback != null) ? of(argument, value, fallback) : of(argument, value);
+    static <T> AdaptationResult<T> of(Object argument, T value, AdaptationProvider<T> operation) {
+        return of(argument, value, operation.fallback());
     }
 
     /**
@@ -241,7 +240,7 @@ public interface AdaptationResult<T> extends Supplier<T> {
      * @return an instance that represents the specified value
      */
     static <T> AdaptationResult<T> of(Object argument, T value, Supplier<? extends T> fallback) {
-        return new DefaultAdaptationResult<>(argument, value, fallback);
+        return new FallbackAdaptationResult<>(argument, value, fallback);
     }
 
     /**
@@ -311,7 +310,7 @@ abstract class AbstractAdaptationResult<T> implements AdaptationResult<T> {
  * @param <T>
  *            the type of the represented value
  */
-final class DefaultAdaptationResult<T> extends AbstractAdaptationResult<T> {
+final class FallbackAdaptationResult<T> extends AbstractAdaptationResult<T> {
 
     /** Fallback supplier. */
     private final Supplier<? extends T> fallback;
@@ -326,7 +325,7 @@ final class DefaultAdaptationResult<T> extends AbstractAdaptationResult<T> {
      * @param supplier
      *            the fallback supplier. It must not be {@code null}.
      */
-    public DefaultAdaptationResult(Object arg, T val, Supplier<? extends T> supplier) {
+    public FallbackAdaptationResult(Object arg, T val, Supplier<? extends T> supplier) {
         super(arg, val);
         fallback = Objects.requireNonNull(supplier);
     }
@@ -343,7 +342,7 @@ final class DefaultAdaptationResult<T> extends AbstractAdaptationResult<T> {
      * @see net.yetamine.sova.AdaptationResult#fallback()
      */
     public AdaptationResult<T> fallback() {
-        return new FallbackAdaptationResult<>(argument(), fallback.get());
+        return AdaptationResult.of(argument(), fallback.get());
     }
 }
 
@@ -374,43 +373,6 @@ final class ImmediateAdaptationResult<T> extends AbstractAdaptationResult<T> {
     @Override
     public String toString() {
         return String.format("AdaptationResult[result=%s, argument=%s, fallback=absent]", get(), argument());
-    }
-
-    /**
-     * @see net.yetamine.sova.AdaptationResult#fallback()
-     */
-    public AdaptationResult<T> fallback() {
-        return new FallbackAdaptationResult<>(argument(), null);
-    }
-}
-
-/**
- * The default implementation for {@link AdaptationResult} that handles just the
- * fallback.
- *
- * @param <T>
- *            the type of the represented value
- */
-final class FallbackAdaptationResult<T> extends AbstractAdaptationResult<T> {
-
-    /**
-     * Creates a new instance.
-     *
-     * @param arg
-     *            the argument of the operation
-     * @param val
-     *            the value to represent
-     */
-    public FallbackAdaptationResult(Object arg, T val) {
-        super(arg, val);
-    }
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return String.format("AdaptationResult[result=%s, argument=%s, fallback=this]", get(), argument());
     }
 
     /**
