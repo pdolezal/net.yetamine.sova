@@ -1,0 +1,348 @@
+/*
+ * Copyright 2016 Yetamine
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package net.yetamine.sova;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+/**
+ * Tests {@link Mappable}.
+ */
+public final class TestMappable {
+
+    // Testing values
+    private static final Integer INTEGER_VALUE = Integer.valueOf(1024);
+    private static final String STRING_VALUE = "hello";
+
+    private static final Map<Object, Object> MAP;
+    static {
+        final Map<Object, Object> data = new HashMap<>();
+        data.put("integer", INTEGER_VALUE);
+        data.put("string", STRING_VALUE);
+        MAP = Collections.unmodifiableMap(data);
+    }
+
+    /**
+     * Tests {@link Mappable#pull(Function)}.
+     */
+    @Test
+    public void testPull_F() {
+        final Function<Object, ?> f = MAP::get;
+        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).pull(f), INTEGER_VALUE);
+        Assert.assertEquals(Mappable.of("string", Downcasting.to(Integer.class)).pull(f), STRING_VALUE);
+        Assert.assertNull(Mappable.of("missing", Downcasting.to(Integer.class)).pull(f));
+    }
+
+    /**
+     * Tests {@link Mappable#pull(Map)}.
+     */
+    @Test
+    public void testPull_M() {
+        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).pull(MAP), INTEGER_VALUE);
+        Assert.assertEquals(Mappable.of("string", Downcasting.to(Integer.class)).pull(MAP), STRING_VALUE);
+        Assert.assertNull(Mappable.of("missing", Downcasting.to(Integer.class)).pull(MAP));
+    }
+
+    /**
+     * Tests {@link Mappable#push(Map, Object)} and
+     * {@link Mappable#push(BiConsumer, Object)}.
+     */
+    @Test
+    public void testPush() {
+        final TestObject i = new TestObject(INTEGER_VALUE);
+        final Mappable<?, TestObject> mappable = Mappable.of("test", Downcasting.to(TestObject.class));
+
+        final Map<Object, Object> m = new HashMap<>();
+        mappable.push(m, i);
+        Assert.assertSame(mappable.pull(m), i);
+
+        final Map<Object, Object> c = new HashMap<>();
+        mappable.push(c::put, i);
+        Assert.assertSame(mappable.pull(c), i);
+    }
+
+    /**
+     * Tests {@link Mappable#get(Function)}.
+     */
+    @Test
+    public void testGet_F() {
+        final Function<Object, ?> f = MAP::get;
+        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).get(f), INTEGER_VALUE);
+        Assert.assertNull(Mappable.of("string", Downcasting.to(Integer.class)).get(f));
+        Assert.assertNull(Mappable.of("missing", Downcasting.to(Object.class)).get(f));
+    }
+
+    /**
+     * Tests {@link Mappable#get(Map)}.
+     */
+    @Test
+    public void testGet_M() {
+        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).get(MAP), INTEGER_VALUE);
+        Assert.assertNull(Mappable.of("string", Downcasting.to(Integer.class)).get(MAP));
+        Assert.assertNull(Mappable.of("missing", Downcasting.to(Object.class)).get(MAP));
+    }
+
+    /**
+     * Tests {@link Mappable#use(Function)}.
+     */
+    @Test
+    public void testUse_F() {
+        final Function<Object, ?> f = MAP::get;
+        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).use(f), INTEGER_VALUE);
+        Assert.assertNull(Mappable.of("string", Downcasting.to(Integer.class)).use(f));
+        Assert.assertNull(Mappable.of("missing", Downcasting.to(Object.class)).use(f));
+
+        final Integer i = Integer.valueOf(1);
+        final AdaptationProvider<Integer> adaptation = Downcasting.withFallbackTo(Integer.class, i);
+        Assert.assertEquals(Mappable.of("integer", adaptation).use(f), INTEGER_VALUE);
+        Assert.assertEquals(Mappable.of("string", adaptation).use(f), i);
+        Assert.assertEquals(Mappable.of("missing", adaptation).use(f), i);
+    }
+
+    /**
+     * Tests {@link Mappable#use(Map)}.
+     */
+    @Test
+    public void testUse_M() {
+        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).use(MAP), INTEGER_VALUE);
+        Assert.assertNull(Mappable.of("string", Downcasting.to(Integer.class)).use(MAP));
+        Assert.assertNull(Mappable.of("missing", Downcasting.to(Object.class)).use(MAP));
+
+        final Integer i = Integer.valueOf(1);
+        final AdaptationProvider<Integer> adaptation = Downcasting.withFallbackTo(Integer.class, i);
+        Assert.assertEquals(Mappable.of("integer", adaptation).use(MAP), INTEGER_VALUE);
+        Assert.assertEquals(Mappable.of("string", adaptation).use(MAP), i);
+        Assert.assertEquals(Mappable.of("missing", adaptation).use(MAP), i);
+    }
+
+    /**
+     * Tests {@link Mappable#find(Function)}.
+     */
+    @Test
+    public void testFind_F() {
+        final Function<Object, ?> f = MAP::get;
+        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).find(f).get(), INTEGER_VALUE);
+        Assert.assertFalse(Mappable.of("string", Downcasting.to(Integer.class)).find(f).isPresent());
+        Assert.assertFalse(Mappable.of("missing", Downcasting.to(Object.class)).find(f).isPresent());
+    }
+
+    /**
+     * Tests {@link Mappable#find(Map)}.
+     */
+    @Test
+    public void testFind_M() {
+        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).find(MAP).get(), INTEGER_VALUE);
+        Assert.assertFalse(Mappable.of("string", Downcasting.to(Integer.class)).find(MAP).isPresent());
+        Assert.assertFalse(Mappable.of("missing", Downcasting.to(Object.class)).find(MAP).isPresent());
+    }
+
+    /**
+     * Tests {@link Mappable#yield(Function)}.
+     */
+    @Test
+    public void testYield_F() {
+        final Integer i = Integer.valueOf(1);
+        final Function<Object, ?> f = MAP::get;
+        final AdaptationProvider<Integer> adaptation = Downcasting.withFallbackTo(Integer.class, i);
+
+        final AdaptationResult<Integer> r1 = Mappable.of("integer", adaptation).yield(f);
+        Assert.assertEquals(r1.argument(), INTEGER_VALUE);
+        Assert.assertEquals(r1.get(), INTEGER_VALUE);
+        Assert.assertEquals(r1.fallback().get(), i);
+
+        final AdaptationResult<Integer> r2 = Mappable.of("string", adaptation).yield(f);
+        Assert.assertEquals(r2.argument(), STRING_VALUE);
+        Assert.assertNull(r2.get());
+        Assert.assertEquals(r2.fallback().get(), i);
+
+        final AdaptationResult<Integer> r3 = Mappable.of("missing", adaptation).yield(f);
+        Assert.assertEquals(r3.argument(), null);
+        Assert.assertNull(r3.get());
+        Assert.assertEquals(r3.fallback().get(), i);
+    }
+
+    /**
+     * Tests {@link Mappable#yield(Map)}.
+     */
+    @Test
+    public void testYield_M() {
+        final Integer i = Integer.valueOf(1);
+        final AdaptationProvider<Integer> adaptation = Downcasting.withFallbackTo(Integer.class, i);
+
+        final AdaptationResult<Integer> r1 = Mappable.of("integer", adaptation).yield(MAP);
+        Assert.assertEquals(r1.argument(), INTEGER_VALUE);
+        Assert.assertEquals(r1.get(), INTEGER_VALUE);
+        Assert.assertEquals(r1.fallback().get(), i);
+
+        final AdaptationResult<Integer> r2 = Mappable.of("string", adaptation).yield(MAP);
+        Assert.assertEquals(r2.argument(), STRING_VALUE);
+        Assert.assertNull(r2.get());
+        Assert.assertEquals(r2.fallback().get(), i);
+
+        final AdaptationResult<Integer> r3 = Mappable.of("missing", adaptation).yield(MAP);
+        Assert.assertEquals(r3.argument(), null);
+        Assert.assertNull(r3.get());
+        Assert.assertEquals(r3.fallback().get(), i);
+    }
+
+    /**
+     * Tests {@link Mappable#put(BiConsumer, Object)}.
+     */
+    @Test
+    public void testPut_F() {
+        final AdaptationProvider<Integer> adaptation = Downcasting.to(Integer.class);
+        final Map<Object, Object> m = new HashMap<>(MAP);
+        final Integer i = Integer.valueOf(1);
+
+        Mappable.of("integer", adaptation).put(m::put, i);
+        Assert.assertEquals(m.get("integer"), i);
+
+        Mappable.of("string", adaptation).put(m::put, i);
+        Assert.assertEquals(m.get("string"), i);
+
+        Mappable.of("missing", adaptation).put(m::put, i);
+        Assert.assertEquals(m.get("missing"), i);
+    }
+
+    /**
+     * Tests {@link Mappable#put(Map, Object)}.
+     */
+    @Test
+    public void testPut_M() {
+        final AdaptationProvider<Integer> adaptation = Downcasting.to(Integer.class);
+        final Map<Object, Object> m = new HashMap<>(MAP);
+        final Integer i = Integer.valueOf(1);
+
+        Assert.assertEquals(Mappable.of("integer", adaptation).put(m, i), INTEGER_VALUE);
+        Assert.assertEquals(m.get("integer"), i);
+
+        Assert.assertNull(Mappable.of("string", adaptation).put(m, i));
+        Assert.assertEquals(m.get("string"), i);
+
+        Assert.assertNull(Mappable.of("missing", adaptation).put(m, i));
+        Assert.assertEquals(m.get("missing"), i);
+    }
+
+    /**
+     * Tests {@link Mappable#let(BiConsumer, Object)}.
+     */
+    @Test
+    public void testLet_F() {
+        final AdaptationProvider<Integer> adaptation = Downcasting.to(Integer.class);
+        final Map<Object, Object> m = new HashMap<>(MAP);
+        final Integer i = Integer.valueOf(1);
+
+        Assert.assertEquals(Mappable.of("integer", adaptation).let(m::put, i).get(), i);
+        Assert.assertEquals(m.get("integer"), i);
+
+        Assert.assertEquals(Mappable.of("string", adaptation).let(m::put, i).get(), i);
+        Assert.assertEquals(m.get("string"), i);
+
+        Assert.assertEquals(Mappable.of("missing", adaptation).let(m::put, i).get(), i);
+        Assert.assertEquals(m.get("missing"), i);
+
+        Assert.assertFalse(Mappable.of("integer", adaptation).let(m::put, "hello").isPresent());
+        Assert.assertEquals(m.get("integer"), i);
+
+        Assert.assertFalse(Mappable.of("none", adaptation).let(m::put, "hello").isPresent());
+        Assert.assertFalse(m.containsKey("none"));
+    }
+
+    /**
+     * Tests {@link Mappable#let(Map, Object)}.
+     */
+    @Test
+    public void testLet_M() {
+        final AdaptationProvider<Integer> adaptation = Downcasting.to(Integer.class);
+        final Map<Object, Object> m = new HashMap<>(MAP);
+        final Integer i = Integer.valueOf(1);
+
+        Assert.assertEquals(Mappable.of("integer", adaptation).let(m, i).get(), i);
+        Assert.assertEquals(m.get("integer"), i);
+
+        Assert.assertEquals(Mappable.of("string", adaptation).let(m, i).get(), i);
+        Assert.assertEquals(m.get("string"), i);
+
+        Assert.assertEquals(Mappable.of("missing", adaptation).let(m, i).get(), i);
+        Assert.assertEquals(m.get("missing"), i);
+
+        Assert.assertFalse(Mappable.of("integer", adaptation).let(m, "hello").isPresent());
+        Assert.assertEquals(m.get("integer"), i);
+
+        Assert.assertFalse(Mappable.of("none", adaptation).let(m, "hello").isPresent());
+        Assert.assertFalse(m.containsKey("none"));
+    }
+
+    /**
+     * Tests {@link Mappable#set(Map, Object, Supplier)}.
+     */
+    @Test
+    public void testSet() {
+        final AdaptationProvider<Integer> adaptation = Downcasting.to(Integer.class);
+        final Map<Object, Object> m = new HashMap<>(MAP);
+        final Integer i = Integer.valueOf(1);
+
+        final Supplier<Integer> f = () -> {
+            Assert.fail();
+            return null;
+        };
+
+        Assert.assertEquals(Mappable.of("integer", adaptation).set(m, i, f), i);
+        Assert.assertEquals(m.get("integer"), i);
+        Assert.assertNull(Mappable.of("integer", adaptation).set(m, null, f));
+        Assert.assertFalse(m.containsKey("integer"));
+
+        Assert.assertEquals(Mappable.of("string", adaptation).set(m, "wrong", () -> i), i);
+        Assert.assertEquals(m.get("string"), STRING_VALUE);
+        Assert.assertNull(Mappable.of("string", adaptation).set(m, "wrong", () -> null));
+        Assert.assertEquals(m.get("string"), STRING_VALUE);
+
+        final Object o = new Object();
+        m.put("string", o);
+        Assert.expectThrows(AdaptationException.class, () -> Mappable.of("string", adaptation).set(m, "wrong", () -> {
+            throw new AdaptationException();
+        }));
+
+        Assert.assertSame(m.get("string"), o);
+    }
+
+    /**
+     * Tests {@link Mappable#supply(Map, Supplier)}.
+     */
+    @Test
+    public void testSupply() {
+        final AdaptationProvider<Integer> adaptation = Downcasting.to(Integer.class);
+        final Map<Object, Object> m = new HashMap<>(MAP);
+        final Integer i = Integer.valueOf(1);
+
+        Assert.assertEquals(Mappable.of("integer", adaptation).supply(m, () -> i), INTEGER_VALUE);
+        Assert.assertEquals(m.get("integer"), INTEGER_VALUE);
+
+        Assert.assertEquals(Mappable.of("string", adaptation).supply(m, () -> i), i);
+        Assert.assertEquals(m.get("string"), i);
+
+        Assert.assertEquals(Mappable.of("missing", adaptation).supply(m, () -> i), i);
+        Assert.assertEquals(m.get("missing"), i);
+    }
+}
