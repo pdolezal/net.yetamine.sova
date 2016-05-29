@@ -50,7 +50,7 @@ import java.util.function.Supplier;
  * for supplying the key.</li>
  * <li>A {@code get} method should use {@link #nullable(Object)} to adapt the
  * result of the data source.</li>
- * <li>A {@code use} method should use {@link #surrogate(Object)} to adapt the
+ * <li>A {@code give} method should use {@link #surrogate(Object)} to adapt the
  * result of the data source.</li>
  * <li>A {@code find} method should use {@link #optional(Object)} to adapt the
  * result of the data source.</li>
@@ -58,11 +58,11 @@ import java.util.function.Supplier;
  * result of the data source.</li>
  * <li>A {@code put} method should use {@link #nullable(Object)} to adapt the
  * value and store the result, using the {@code push} variant.</li>
- * <li>A {@code set} method should use {@link #nullable(Object)} to adapt the
- * value and store the result; however, if the argument is {@code null}, then
- * the method should remove the mapping from the target, otherwise attempt to
- * update it, perhaps using a fallback strategy for non-adaptable values.</li>
- * <li>A {@code let} method should use {@link #optional(Object)} to adapt the
+ * <li>A {@code let} method should use {@link #nullable(Object)} to adapt the
+ * value and store the result, using the {@code push} variant, if the adapted
+ * value is not {@code null}, otherwise the association should be removed from
+ * the target map.</li>
+ * <li>A {@code have} method should use {@link #optional(Object)} to adapt the
  * value and store the result if adaptation succeeded, using the {@code push}
  * variant. The result is then returned, so that the adapted value can be used
  * or a failure can be handled in any specific way.</li>
@@ -205,7 +205,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      *
      * @return the result of the adaptation, or the default
      */
-    default V use(Function<? super K, ?> source) {
+    default V give(Function<? super K, ?> source) {
         return surrogate(pull(source));
     }
 
@@ -260,7 +260,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      *
      * @return the result of the adaptation
      */
-    default Optional<V> let(BiConsumer<? super K, ? super V> consumer, Object value) {
+    default Optional<V> have(BiConsumer<? super K, ? super V> consumer, Object value) {
         final Optional<V> result = optional(value);
         result.ifPresent(v -> push(consumer, v));
         return result;
@@ -320,7 +320,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      *
      * @return the result of the adaptation, or the default
      */
-    default V use(Map<?, ?> source) {
+    default V give(Map<?, ?> source) {
         return surrogate(pull(source));
     }
 
@@ -366,43 +366,20 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
     }
 
     /**
-     * Puts the specified value to the given map, or removes the existing value
-     * from the map if the specified value is {@code null}.
-     *
-     * <p>
-     * If the value is not {@code null}, but can't be adapted, the method itself
-     * does not modify the map and rather invokes the given {@link Supplier} for
-     * resolving the situation, e.g., by throwing a suitable exception or fixing
-     * the map and returning a surrogate result.
+     * Puts the adapted value to the given map, or removes the value from the
+     * map if the value can't be adapted (including {@code null}).
      *
      * @param consumer
      *            the map to accept the {@link #remap()} result and the adapted
      *            value. It must not be {@code null}.
      * @param value
      *            the value to adapt and transfer
-     * @param fallback
-     *            the fallback supplier to invoke when the value is not
-     *            {@code null}, but can't be adapted. It must not be
-     *            {@code null}.
      *
-     * @return the adaptation of the specified value
+     * @return the adapted result of the previous value associated with the key
      */
-    default V set(Map<? super K, ? super V> consumer, Object value, Supplier<? extends V> fallback) {
-        Objects.requireNonNull(fallback);
-
-        if (value == null) {
-            consumer.remove(remap());
-            return null;
-        }
-
-        final V result = nullable(value); // May return null only when adaptation fails
-
-        if (result == null) {
-            return fallback.get();
-        }
-
-        push(consumer, result);
-        return result;
+    default V let(Map<? super K, ? super V> consumer, Object value) {
+        final V push = nullable(value);
+        return nullable((push != null) ? push(consumer, push) : consumer.remove(remap()));
     }
 
     /**
@@ -417,7 +394,7 @@ public interface Mappable<K, V> extends AdaptationStrategy<V> {
      *
      * @return the result of the adaptation
      */
-    default Optional<V> let(Map<? super K, ? super V> consumer, Object value) {
+    default Optional<V> have(Map<? super K, ? super V> consumer, Object value) {
         final Optional<V> result = optional(value);
         result.ifPresent(v -> push(consumer, v));
         return result;
