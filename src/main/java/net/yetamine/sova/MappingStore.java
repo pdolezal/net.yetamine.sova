@@ -83,6 +83,25 @@ public interface MappingStore<K, V> extends Mapping {
     <R extends V> R put(Mappable<? extends K, R> ref, R value);
 
     /**
+     * Associates the specified value with the specified reference if the
+     * reference is not associated yet.
+     *
+     * @param <R>
+     *            the type of the result
+     * @param ref
+     *            the reference with which the specified value is to be
+     *            associated. It must not be {@code null}.
+     * @param value
+     *            the value to be associated with the specified reference. It
+     *            must not be {@code null}.
+     *
+     * @return the previously associated value, or {@code null} if no such value
+     *         existed before or the value could not be adapted to the desired
+     *         form
+     */
+    <R extends V> R putIfAbsent(Mappable<? extends K, R> ref, R value);
+
+    /**
      * Associates the specified value with the specified reference.
      *
      * <p>
@@ -103,13 +122,13 @@ public interface MappingStore<K, V> extends Mapping {
      *         existed before or the value could not be adapted to the desired
      *         form
      */
-    default <R extends V> V set(Mappable<? extends K, R> ref, R value) {
+    default <R extends V> R let(Mappable<? extends K, R> ref, R value) {
         return (value == null) ? remove(ref) : put(ref, value);
     }
 
     /**
      * Associates the specified value with the specified reference if the value
-     * can be adapted to a valid object.
+     * can be adapted.
      *
      * @param <R>
      *            the type of the result
@@ -121,26 +140,7 @@ public interface MappingStore<K, V> extends Mapping {
      *
      * @return the result of the adaptation
      */
-    <R extends V> Optional<R> let(Mappable<? extends K, R> ref, Object value);
-
-    /**
-     * Associates the specified value with the specified reference if the
-     * reference is not associated yet.
-     *
-     * @param <R>
-     *            the type of the result
-     * @param ref
-     *            the reference with which the specified value is to be
-     *            associated. It must not be {@code null}.
-     * @param value
-     *            the value to be associated with the specified reference. It
-     *            must not be {@code null}.
-     *
-     * @return the previously associated value, or {@code null} if no such value
-     *         existed before or the value could not be adapted to the desired
-     *         form
-     */
-    <R extends V> R putIfAbsent(Mappable<? extends K, R> ref, R value);
+    <R extends V> Optional<R> have(Mappable<? extends K, R> ref, Object value);
 
     // Replacement methods
 

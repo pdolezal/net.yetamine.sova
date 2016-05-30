@@ -46,13 +46,6 @@ public interface Mapper extends Mapping {
     }
 
     /**
-     * @see net.yetamine.sova.Mapping#find(net.yetamine.sova.Mappable)
-     */
-    default <R> Optional<R> find(Mappable<?, R> ref) {
-        return ref.optional(map(ref.remap()));
-    }
-
-    /**
      * @see net.yetamine.sova.Mapping#get(net.yetamine.sova.Mappable)
      */
     default <R> R get(Mappable<?, R> ref) {
@@ -60,16 +53,23 @@ public interface Mapper extends Mapping {
     }
 
     /**
-     * @see net.yetamine.sova.Mapping#use(net.yetamine.sova.Mappable)
+     * @see net.yetamine.sova.Mapping#give(net.yetamine.sova.Mappable)
      */
-    default <R> R use(Mappable<?, R> symbol) {
-        return symbol.surrogate(map(symbol.remap()));
+    default <R> R give(Mappable<?, R> ref) {
+        return ref.surrogate(map(ref.remap()));
+    }
+
+    /**
+     * @see net.yetamine.sova.Mapping#find(net.yetamine.sova.Mappable)
+     */
+    default <R> Optional<R> find(Mappable<?, R> ref) {
+        return ref.optional(map(ref.remap()));
     }
 
     /**
      * @see net.yetamine.sova.Mapping#yield(net.yetamine.sova.Mappable)
      */
-    default <R> AdaptationResult<R> yield(Mappable<?, R> symbol) {
-        return symbol.adapt(map(symbol.remap()));
+    default <R> AdaptationResult<R> yield(Mappable<?, R> ref) {
+        return ref.adapt(map(ref.remap()));
     }
 }

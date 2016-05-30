@@ -31,8 +31,8 @@ public final class TestAdaptation {
      */
     @Test
     public void testAttempt() {
-        final TestObject o = new TestObject(1024);
-        final Adaptation<TestObject> adaptation = adaptation();
+        final TestingObject o = new TestingObject(1024);
+        final Adaptation<TestingObject> adaptation = adaptation();
         Assert.assertFalse(adaptation.attempt(null).isPresent());
         Assert.assertFalse(adaptation.attempt("no").isPresent());
         Assert.assertSame(adaptation.attempt(o).get(), o);
@@ -43,16 +43,16 @@ public final class TestAdaptation {
      */
     @Test
     public void testFilter() {
-        final TestObject o = new TestObject(1024);
+        final TestingObject o = new TestingObject(1024);
 
-        final Adaptation<TestObject> adaptation = adaptation().filter(n -> {
+        final Adaptation<TestingObject> adaptation = adaptation().filter(n -> {
             final Object value = n.value();
             return (value instanceof Integer) && ((Integer) value > 0);
         });
 
         Assert.assertFalse(adaptation.attempt(null).isPresent());
         Assert.assertFalse(adaptation.attempt("no").isPresent());
-        Assert.assertFalse(adaptation.attempt(new TestObject(0)).isPresent());
+        Assert.assertFalse(adaptation.attempt(new TestingObject(0)).isPresent());
         Assert.assertEquals(adaptation.attempt(o).get(), o);
     }
 
@@ -62,28 +62,28 @@ public final class TestAdaptation {
     @Test
     public void testMap() {
         final int i = 1024;
-        final TestObject o = new TestObject(i);
+        final TestingObject o = new TestingObject(i);
 
-        final Function<Object, TestObject> map = adaptation().map(n -> {
+        final Function<Object, TestingObject> map = adaptation().map(n -> {
             if (n == null) {
                 return n;
             }
 
             final Object value = n.value();
-            return (value instanceof Integer) ? new TestObject(-((Integer) value)) : n;
+            return (value instanceof Integer) ? new TestingObject(-((Integer) value)) : n;
         });
 
         Assert.assertNull(map.apply(null));
         Assert.assertNull(map.apply("no"));
-        Assert.assertEquals(map.apply(o), new TestObject(-i));
+        Assert.assertEquals(map.apply(o), new TestingObject(-i));
     }
 
     /**
-     * Returns the testing adaptation that adapts to {@link TestObject}.
+     * Returns the testing adaptation that adapts to {@link TestingObject}.
      *
      * @return the testing adaptation
      */
-    private static Adaptation<TestObject> adaptation() {
-        return o -> (o instanceof TestObject) ? (TestObject) o : null;
+    private static Adaptation<TestingObject> adaptation() {
+        return o -> (o instanceof TestingObject) ? (TestingObject) o : null;
     }
 }

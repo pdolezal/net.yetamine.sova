@@ -52,22 +52,6 @@ public interface Mapping {
     boolean contains(Mappable<?, ?> ref);
 
     /**
-     * Returns an {@link Optional} with the value associated with the given
-     * reference, or an empty container if no mapping for the reference exists.
-     *
-     * @param <R>
-     *            the type of the result
-     * @param ref
-     *            the reference whose associated value is to be returned. It
-     *            must not be {@code null}.
-     *
-     * @return an {@link Optional} containing the value associated with the
-     *         given reference, or an empty container if no mapping for the
-     *         reference exists
-     */
-    <R> Optional<R> find(Mappable<?, R> ref);
-
-    /**
      * Returns the value associated with the given reference, or {@code null} if
      * no mapping for the reference exists.
      *
@@ -95,7 +79,23 @@ public interface Mapping {
      * @return the value associated with the given reference, or the default
      *         value for the reference if no mapping for the reference exists
      */
-    <R> R use(Mappable<?, R> ref);
+    <R> R give(Mappable<?, R> ref);
+
+    /**
+     * Returns an {@link Optional} with the value associated with the given
+     * reference, or an empty container if no mapping for the reference exists.
+     *
+     * @param <R>
+     *            the type of the result
+     * @param ref
+     *            the reference whose associated value is to be returned. It
+     *            must not be {@code null}.
+     *
+     * @return an {@link Optional} containing the value associated with the
+     *         given reference, or an empty container if no mapping for the
+     *         reference exists
+     */
+    <R> Optional<R> find(Mappable<?, R> ref);
 
     /**
      * Returns an {@link AdaptationResult} describing the attempt to adapt the

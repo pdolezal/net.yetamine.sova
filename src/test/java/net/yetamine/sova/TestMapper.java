@@ -71,6 +71,22 @@ public final class TestMapper {
     }
 
     /**
+     * Tests {@link Mapper#give(Mappable)}.
+     */
+    @Test
+    public void testGive() {
+        Assert.assertEquals(MAPPER.give(Mappable.of("integer", Downcasting.to(Integer.class))), INTEGER_VALUE);
+        Assert.assertNull(MAPPER.give(Mappable.of("string", Downcasting.to(Integer.class))));
+        Assert.assertNull(MAPPER.give(Mappable.of("missing", Downcasting.to(Object.class))));
+
+        final Integer i = Integer.valueOf(1);
+        Assert.assertEquals(MAPPER.give(Mappable.of("integer", Downcasting.withFallbackTo(Integer.class, i))),
+                INTEGER_VALUE);
+        Assert.assertEquals(MAPPER.give(Mappable.of("string", Downcasting.withFallbackTo(Integer.class, i))), i);
+        Assert.assertEquals(MAPPER.give(Mappable.of("missing", Downcasting.withFallbackTo(Integer.class, i))), i);
+    }
+
+    /**
      * Tests {@link Mapper#find(Mappable)}.
      */
     @Test
@@ -81,38 +97,26 @@ public final class TestMapper {
     }
 
     /**
-     * Tests {@link Mapper#use(Mappable)}.
-     */
-    @Test
-    public void testUse() {
-        Assert.assertEquals(MAPPER.use(Mappable.of("integer", Downcasting.to(Integer.class))), INTEGER_VALUE);
-        Assert.assertNull(MAPPER.use(Mappable.of("string", Downcasting.to(Integer.class))));
-        Assert.assertNull(MAPPER.use(Mappable.of("missing", Downcasting.to(Object.class))));
-
-        final Integer i = Integer.valueOf(1);
-        Assert.assertEquals(MAPPER.use(Mappable.of("integer", Downcasting.withFallbackTo(Integer.class, i))), INTEGER_VALUE);
-        Assert.assertEquals(MAPPER.use(Mappable.of("string", Downcasting.withFallbackTo(Integer.class, i))), i);
-        Assert.assertEquals(MAPPER.use(Mappable.of("missing", Downcasting.withFallbackTo(Integer.class, i))), i);
-    }
-
-    /**
      * Tests {@link Mapper#yield(Mappable)}.
      */
     @Test
     public void testYield() {
         final Integer i = Integer.valueOf(1);
 
-        final AdaptationResult<Integer> r1 = MAPPER.yield(Mappable.of("integer", Downcasting.withFallbackTo(Integer.class, i)));
+        final AdaptationResult<Integer> r1 = MAPPER
+                .yield(Mappable.of("integer", Downcasting.withFallbackTo(Integer.class, i)));
         Assert.assertEquals(r1.argument(), INTEGER_VALUE);
         Assert.assertEquals(r1.get(), INTEGER_VALUE);
         Assert.assertEquals(r1.fallback().get(), i);
 
-        final AdaptationResult<Integer> r2 = MAPPER.yield(Mappable.of("string", Downcasting.withFallbackTo(Integer.class, i)));
+        final AdaptationResult<Integer> r2 = MAPPER
+                .yield(Mappable.of("string", Downcasting.withFallbackTo(Integer.class, i)));
         Assert.assertEquals(r2.argument(), STRING_VALUE);
         Assert.assertNull(r2.get());
         Assert.assertEquals(r2.fallback().get(), i);
 
-        final AdaptationResult<Integer> r3 = MAPPER.yield(Mappable.of("missing", Downcasting.withFallbackTo(Integer.class, i)));
+        final AdaptationResult<Integer> r3 = MAPPER
+                .yield(Mappable.of("missing", Downcasting.withFallbackTo(Integer.class, i)));
         Assert.assertEquals(r3.argument(), null);
         Assert.assertNull(r3.get());
         Assert.assertEquals(r3.fallback().get(), i);

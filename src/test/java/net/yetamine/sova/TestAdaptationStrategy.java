@@ -31,9 +31,9 @@ public final class TestAdaptationStrategy {
      */
     @Test
     public void testNullable() {
-        final TestObject i = new TestObject(1024);
-        final TestObject f = new TestObject(0);
-        final AdaptationStrategy<TestObject> s = new TestStrategy<>(Downcasting.withFallbackTo(TestObject.class, f));
+        final TestingObject i = new TestingObject(1024);
+        final TestingObject f = new TestingObject(0);
+        final AdaptationStrategy<TestingObject> s = new TestStrategy<>(Downcasting.withFallbackTo(TestingObject.class, f));
         Assert.assertNull(s.nullable("hello"));
         Assert.assertSame(s.nullable(i), i);
     }
@@ -43,9 +43,9 @@ public final class TestAdaptationStrategy {
      */
     @Test
     public void testOptional() {
-        final TestObject i = new TestObject(1024);
-        final TestObject f = new TestObject(0);
-        final AdaptationStrategy<TestObject> s = new TestStrategy<>(Downcasting.withFallbackTo(TestObject.class, f));
+        final TestingObject i = new TestingObject(1024);
+        final TestingObject f = new TestingObject(0);
+        final AdaptationStrategy<TestingObject> s = new TestStrategy<>(Downcasting.withFallbackTo(TestingObject.class, f));
         Assert.assertFalse(s.optional("hello").isPresent());
         Assert.assertSame(s.optional(i).get(), i);
     }
@@ -55,14 +55,14 @@ public final class TestAdaptationStrategy {
      */
     @Test
     public void testSurrogate() {
-        final TestObject i = new TestObject(1024);
+        final TestingObject i = new TestingObject(1024);
 
-        final AdaptationStrategy<TestObject> s1 = new TestStrategy<>(Downcasting.to(TestObject.class));
+        final AdaptationStrategy<TestingObject> s1 = new TestStrategy<>(Downcasting.to(TestingObject.class));
         Assert.assertNull(s1.surrogate("hello"));
         Assert.assertSame(s1.surrogate(i), i);
 
-        final TestObject v = new TestObject(1);
-        final AdaptationStrategy<TestObject> s2 = new TestStrategy<>(Downcasting.withFallbackTo(TestObject.class, v));
+        final TestingObject v = new TestingObject(1);
+        final AdaptationStrategy<TestingObject> s2 = new TestStrategy<>(Downcasting.withFallbackTo(TestingObject.class, v));
         Assert.assertEquals(s2.surrogate("hello"), v);
         Assert.assertEquals(s2.surrogate(i), i);
     }
@@ -72,10 +72,10 @@ public final class TestAdaptationStrategy {
      */
     @Test
     public void testFunction() {
-        final TestObject i = new TestObject(1024);
+        final TestingObject i = new TestingObject(1024);
 
-        final AdaptationStrategy<TestObject> s = new TestStrategy<>(Downcasting.to(TestObject.class));
-        final Function<Object, AdaptationResult<TestObject>> f = s.function();
+        final AdaptationStrategy<TestingObject> s = new TestStrategy<>(Downcasting.to(TestingObject.class));
+        final Function<Object, AdaptationResult<TestingObject>> f = s.function();
 
         Assert.assertNull(f.andThen(AdaptationResult::get).apply("hello"));
         Assert.assertSame(f.andThen(AdaptationResult::get).apply(i), i);

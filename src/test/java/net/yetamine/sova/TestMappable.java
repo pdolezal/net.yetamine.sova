@@ -70,8 +70,8 @@ public final class TestMappable {
      */
     @Test
     public void testPush() {
-        final TestObject i = new TestObject(INTEGER_VALUE);
-        final Mappable<?, TestObject> mappable = Mappable.of("test", Downcasting.to(TestObject.class));
+        final TestingObject i = new TestingObject(INTEGER_VALUE);
+        final Mappable<?, TestingObject> mappable = Mappable.of("test", Downcasting.to(TestingObject.class));
 
         final Map<Object, Object> m = new HashMap<>();
         mappable.push(m, i);
