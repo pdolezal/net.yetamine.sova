@@ -32,7 +32,7 @@ public final class TestAdaptationResult {
      */
     @Test
     public void testArgument() {
-        final TestingObject o = new TestingObject(1024);
+        final MockObject o = new MockObject(1024);
         Assert.assertNull(AdaptationResult.of(null, o).argument());
         Assert.assertSame(AdaptationResult.of((Object) o, null).argument(), o);
     }
@@ -42,7 +42,7 @@ public final class TestAdaptationResult {
      */
     @Test
     public void testGet() {
-        final TestingObject o = new TestingObject(1024);
+        final MockObject o = new MockObject(1024);
         Assert.assertNull(AdaptationResult.of(o, null).get());
         Assert.assertSame(AdaptationResult.of(null, o).get(), o);
     }
@@ -52,7 +52,7 @@ public final class TestAdaptationResult {
      */
     @Test
     public void testPresence() {
-        final TestingObject i = new TestingObject(1024);
+        final MockObject i = new MockObject(1024);
         Assert.assertFalse(AdaptationResult.of(i, null).isPresent());
         AdaptationResult.of(i, null).ifPresent(o -> Assert.fail());
 
@@ -71,7 +71,7 @@ public final class TestAdaptationResult {
      */
     @Test
     public void testOptional() {
-        final TestingObject i = new TestingObject(1024);
+        final MockObject i = new MockObject(1024);
         Assert.assertFalse(AdaptationResult.of(i, null).optional().isPresent());
         AdaptationResult.of(i, null).optional().ifPresent(o -> Assert.fail());
 
@@ -84,19 +84,19 @@ public final class TestAdaptationResult {
      */
     @Test
     public void testFallback() {
-        final TestingObject i = new TestingObject(1024);
-        final TestingObject f = new TestingObject(1025);
+        final MockObject i = new MockObject(1024);
+        final MockObject f = new MockObject(1025);
 
-        final AdaptationResult<TestingObject> iar = AdaptationResult.of(i, f);
-        final AdaptationResult<TestingObject> iarf = iar.fallback();
+        final AdaptationResult<MockObject> iar = AdaptationResult.of(i, f);
+        final AdaptationResult<MockObject> iarf = iar.fallback();
         Assert.assertSame(iarf.argument(), i);
         Assert.assertSame(iarf.get(), f);
 
-        final AdaptationResult<TestingObject> far = AdaptationResult.of(i, null, () -> f);
+        final AdaptationResult<MockObject> far = AdaptationResult.of(i, null, () -> f);
         Assert.assertSame(far.argument(), i);
         Assert.assertNull(far.get());
 
-        final AdaptationResult<TestingObject> farf = far.fallback();
+        final AdaptationResult<MockObject> farf = far.fallback();
         Assert.assertSame(farf.argument(), i);
         Assert.assertSame(farf.get(), f);
     }
@@ -106,9 +106,9 @@ public final class TestAdaptationResult {
      */
     @Test
     public void testRequire() {
-        final TestingObject i = new TestingObject(1024);
+        final MockObject i = new MockObject(1024);
 
-        final AdaptationResult<TestingObject> ar = AdaptationResult.of(i, i);
+        final AdaptationResult<MockObject> ar = AdaptationResult.of(i, i);
         Assert.assertSame(ar.require(o -> new AssertionError("Failed: " + o)), i);
         Assert.assertSame(ar.require(), i);
 
@@ -134,13 +134,13 @@ public final class TestAdaptationResult {
      */
     @Test
     public void testRequest() {
-        final TestingObject i = new TestingObject(1024);
+        final MockObject i = new MockObject(1024);
 
-        final AdaptationResult<TestingObject> iar = AdaptationResult.of(i, i);
+        final AdaptationResult<MockObject> iar = AdaptationResult.of(i, i);
         Assert.assertSame(iar.request(o -> new AssertionError("Failed: " + o)), i);
         Assert.assertSame(iar.request(), i);
 
-        final AdaptationResult<TestingObject> nar = AdaptationResult.of(null, null);
+        final AdaptationResult<MockObject> nar = AdaptationResult.of(null, null);
         Assert.assertNull(nar.request(o -> new AssertionError("Failed: " + o)));
         Assert.assertNull(nar.request());
 

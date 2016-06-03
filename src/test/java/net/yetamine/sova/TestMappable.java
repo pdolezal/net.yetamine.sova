@@ -49,9 +49,10 @@ public final class TestMappable {
     @Test
     public void testPull_F() {
         final Function<Object, ?> f = MAP::get;
-        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).pull(f), INTEGER_VALUE);
-        Assert.assertEquals(Mappable.of("string", Downcasting.to(Integer.class)).pull(f), STRING_VALUE);
-        Assert.assertNull(Mappable.of("missing", Downcasting.to(Integer.class)).pull(f));
+        final AdaptationProvider<Integer> p = Downcasting.to(Integer.class);
+        Assert.assertEquals(Mappable.of("integer", p).pull(f), INTEGER_VALUE);
+        Assert.assertEquals(Mappable.of("string", p).pull(f), STRING_VALUE);
+        Assert.assertNull(Mappable.of("missing", p).pull(f));
     }
 
     /**
@@ -59,9 +60,10 @@ public final class TestMappable {
      */
     @Test
     public void testPull_M() {
-        Assert.assertEquals(Mappable.of("integer", Downcasting.to(Integer.class)).pull(MAP), INTEGER_VALUE);
-        Assert.assertEquals(Mappable.of("string", Downcasting.to(Integer.class)).pull(MAP), STRING_VALUE);
-        Assert.assertNull(Mappable.of("missing", Downcasting.to(Integer.class)).pull(MAP));
+        final AdaptationProvider<Integer> p = Downcasting.to(Integer.class);
+        Assert.assertEquals(Mappable.of("integer", p).pull(MAP), INTEGER_VALUE);
+        Assert.assertEquals(Mappable.of("string", p).pull(MAP), STRING_VALUE);
+        Assert.assertNull(Mappable.of("missing", p).pull(MAP));
     }
 
     /**
@@ -70,8 +72,8 @@ public final class TestMappable {
      */
     @Test
     public void testPush() {
-        final TestingObject i = new TestingObject(INTEGER_VALUE);
-        final Mappable<?, TestingObject> mappable = Mappable.of("test", Downcasting.to(TestingObject.class));
+        final MockObject i = new MockObject(INTEGER_VALUE);
+        final Mappable<?, MockObject> mappable = Mappable.of("test", Downcasting.to(MockObject.class));
 
         final Map<Object, Object> m = new HashMap<>();
         mappable.push(m, i);

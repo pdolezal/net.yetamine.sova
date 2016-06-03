@@ -21,7 +21,7 @@ import java.util.Objects;
 /**
  * A test object for adapting and yet useful for equality and identity tests.
  */
-public final class TestingObject {
+public final class MockObject {
 
     /** Value of the object. */
     private final Object value;
@@ -32,14 +32,14 @@ public final class TestingObject {
      * @param o
      *            the object to wrap
      */
-    public TestingObject(Object o) {
+    public MockObject(Object o) {
         value = o;
     }
 
     /**
      * Creates a new instance with {@code null} value.
      */
-    public TestingObject() {
+    public MockObject() {
         this(null);
     }
 
@@ -48,7 +48,7 @@ public final class TestingObject {
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof TestingObject) && Objects.equals(((TestingObject) obj).value, value);
+        return (obj instanceof MockObject) && Objects.equals(((MockObject) obj).value, value);
     }
 
     /**
