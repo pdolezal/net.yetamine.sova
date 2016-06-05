@@ -31,10 +31,14 @@ import org.testng.annotations.Test;
  */
 public final class TestMappable {
 
-    // Testing values
+    /** Value to be present under the key {@code "integer"}. */
     private static final Integer INTEGER_VALUE = Integer.valueOf(1024);
+    /** Value to be present under the key {@code "string"}. */
     private static final String STRING_VALUE = "hello";
 
+    /**
+     * Testing map with {@link #INTEGER_VALUE} and {@link #STRING_VALUE}.
+     */
     private static final Map<Object, Object> MAP;
     static {
         final Map<Object, Object> data = new HashMap<>();

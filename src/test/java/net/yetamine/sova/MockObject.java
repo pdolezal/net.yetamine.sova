@@ -21,7 +21,7 @@ import java.util.Objects;
 /**
  * A test object for adapting and yet useful for equality and identity tests.
  */
-public final class MockObject {
+final class MockObject {
 
     /** Value of the object. */
     private final Object value;

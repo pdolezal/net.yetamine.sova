@@ -28,10 +28,15 @@ import org.testng.annotations.Test;
  */
 public final class TestMapper {
 
-    // Testing values
+    /** Value to be present under the key {@code "integer"}. */
     private static final Integer INTEGER_VALUE = Integer.valueOf(1024);
+    /** Value to be present under the key {@code "string"}. */
     private static final String STRING_VALUE = "hello";
 
+    /**
+     * Testing {@link Mapper} returning both {@link #INTEGER_VALUE} and
+     * {@link #STRING_VALUE}.
+     */
     private static final Mapper MAPPER;
     static {
         final Map<Object, Object> data = new HashMap<>();
