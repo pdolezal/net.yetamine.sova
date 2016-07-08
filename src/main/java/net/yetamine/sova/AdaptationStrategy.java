@@ -134,4 +134,40 @@ public interface AdaptationStrategy<T> extends AdaptationProvider<T> {
     default Function<Object, AdaptationResult<T>> function() {
         return this::adapt;
     }
+
+    // Factory for bridging to an AdaptationProvider
+
+    /**
+     * Makes an instance using the given {@link AdaptationProvider}.
+     *
+     * @param <T>
+     *            the type of resulting values
+     * @param provider
+     *            the provider of the strategy. It must not be {@code null}.
+     *
+     * @return an instance using the given {@link AdaptationProvider}.
+     */
+    static <T> AdaptationStrategy<T> using(AdaptationProvider<T> provider) {
+        return new AdaptationStrategyBridge<>(provider);
+    }
+}
+
+/**
+ * Default implementation of {@link AdaptationStrategy} for bridging to
+ * {@link AdaptationProvider}.
+ *
+ * @param <T>
+ *            the type of resulting values
+ */
+final class AdaptationStrategyBridge<T> extends AdaptationDelegate<T> implements AdaptationStrategy<T> {
+
+    /**
+     * Creates a new instance.
+     *
+     * @param provider
+     *            the provider of the strategy. It must not be {@code null}.
+     */
+    public AdaptationStrategyBridge(AdaptationProvider<T> provider) {
+        super(provider.rtti(), provider.adaptation(), provider.fallback());
+    }
 }
