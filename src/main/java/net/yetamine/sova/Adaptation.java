@@ -28,12 +28,12 @@ import java.util.function.Predicate;
  * <p>
  * The resulting format of an adaptation has the specified type and may require
  * additional conditions on the representation that are not imposed by the type
- * itself (e.g., an adaptation may return a non-empty list of numbers). However,
- * adaptations differs from conversions: a general conversion transforms values
- * of one type to values of another type, while all adaptations must accept any
- * object and attempt to adapt it to the desired format if the object satisfies
- * some preconditions set by the adaptation's implementation; an adaptation has
- * to satisfy additional constraints described below.
+ * itself (e.g., an adaptation may return a non-empty list of numbers). Usually,
+ * an adaptation does not change the type of its arguments, rather verifies the
+ * type and the preconditions, which differs from a conversion. On the other
+ * hand, an implementation may support multiple types of the argument, while
+ * specifying one of them as the canonical format, which shall be the result of
+ * adapting the other variants.
  *
  * <p>
  * This interface intentionally does not inherit from {@link Function}, which is
