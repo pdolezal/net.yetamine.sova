@@ -32,7 +32,7 @@ import net.yetamine.sova.AdaptationProvider;
  * @param <T>
  *            the type of resulting values
  */
-public abstract class DelegatingSymbol<T> extends AbstractSymbol<T> {
+public abstract class DelegatingSymbol<T> extends ExpansiveSymbol<T> {
 
     /** Actual adaptation implementation. */
     private final Adaptation<T> adaptation;

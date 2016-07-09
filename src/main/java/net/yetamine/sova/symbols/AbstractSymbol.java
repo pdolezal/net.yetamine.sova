@@ -16,28 +16,28 @@
 
 package net.yetamine.sova.symbols;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.StringJoiner;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-import net.yetamine.lang.introspective.Introspection;
+import net.yetamine.sova.AdaptationResult;
 import net.yetamine.sova.Symbol;
 
 /**
  * An abstract base class for implementing the {@link Symbol} interface.
  *
  * <p>
- * This class extends {@link SymbolCore} with introspection feature and provides
- * an improved {@link #toString} implementation, using the introspection data to
- * render the result.
+ * This class makes most of the inherited method implementations final in order
+ * to increase the robustness of the implementation, which makes it a good base
+ * for other extensible classes. Still, since {@link Symbol} is an interface,
+ * making mixins or cross-hierarchy extensions is possible.
  *
  * @param <T>
  *            the type of resulting values
  */
-public abstract class AbstractSymbol<T> extends SymbolCore<T> implements Introspection {
-
-    /** Cached {@link #toString()} result. */
-    private String toString;
+public abstract class AbstractSymbol<T> implements Symbol<T> {
 
     /**
      * Prepares a new instance.
@@ -47,72 +47,186 @@ public abstract class AbstractSymbol<T> extends SymbolCore<T> implements Introsp
     }
 
     /**
-     * The implementation uses {@link #render()} to render the actual result and
-     * stores the result, so that it does not have to be rendered again. When no
-     * result is provided, {@link Object#toString()} is used instead.
-     *
-     * @see java.lang.Object#toString()
+     * @see net.yetamine.sova.AdaptationStrategy#nullable(java.lang.Object)
      */
     @Override
-    public final String toString() {
-        final String current = toString;
-        if (current != null) { // There is something cached
-            return current;
-        }
-
-        String update = render();
-        if (update == null) { // Use the fallback when the custom rendering fails
-            update = super.toString();
-        }
-
-        toString = update;
-        return update;
+    public final T nullable(Object o) {
+        return Symbol.super.nullable(o);
     }
 
     /**
-     * @see net.yetamine.lang.introspective.Introspection#introspect()
+     * @see net.yetamine.sova.AdaptationStrategy#optional(java.lang.Object)
      */
     @Override
-    public final Map<?, ?> introspect() {
-        final Map<Object, Object> result = new LinkedHashMap<>();
-        introspect(result);
-        return result;
+    public final Optional<T> optional(Object o) {
+        return Symbol.super.optional(o);
     }
 
     /**
-     * Adds implementation-specific features to the map of results provided by
-     * the {@link #introspect()} method.
-     *
-     * <p>
-     * Implementations are supposed to invoke the inherited implementations and
-     * just add their own data. But since the whole map is available, inherited
-     * classes may even remove elements that are not correct for them.
-     *
-     * @param result
-     *            the result to present. It must not be {@code null}.
+     * @see net.yetamine.sova.AdaptationStrategy#surrogate(java.lang.Object)
      */
-    protected void introspect(Map<Object, Object> result) {
-        // Do nothing
+    @Override
+    public final T surrogate(Object o) {
+        return Symbol.super.surrogate(o);
     }
 
     /**
-     * Renders the result for {@link #toString()}.
-     *
-     * <p>
-     * The default implementation uses {@link #introspect()} to retrieve the
-     * attributes that are rendered as the part of the result. Inherited classes
-     * may override this method to provide different implementation, however, it
-     * is recommended to mimic the result of the default implementation that has
-     * the form of <tt>symbol[<i>details</i>]</tt> where <i>details</i> provide
-     * the important information about the instance.
-     *
-     * @return the string representation which {@link #toString()} should
-     *         return, or {@code null} if {@link Object#toString()} shall be
-     *         used to render the result instead
+     * @see net.yetamine.sova.AdaptationStrategy#function()
      */
-    protected String render() {
-        final StringJoiner result = new StringJoiner(", ", "symbol[", "]").setEmptyValue(super.toString());
-        introspect().forEach((name, value) -> result.add(new StringBuilder(name.toString()).append('=').append(value)));
-        return result.toString();
+    @Override
+    public final Function<Object, AdaptationResult<T>> function() {
+        return Symbol.super.function();
+    }
+
+    // Generic access methods
+
+    /**
+     * @see net.yetamine.sova.Mappable#pull(java.util.function.Function)
+     */
+    @Override
+    public final <R> R pull(Function<? super Symbol<T>, ? extends R> source) {
+        return Symbol.super.pull(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.symbols.AbstractSymbol#push(java.util.function.BiConsumer,
+     *      java.lang.Object)
+     */
+    @Override
+    public final void push(BiConsumer<? super Symbol<T>, ? super T> consumer, T value) {
+        Symbol.super.push(consumer, value);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#get(java.util.function.Function)
+     */
+    @Override
+    public final T get(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.get(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#give(java.util.function.Function)
+     */
+    @Override
+    public final T give(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.give(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#find(java.util.function.Function)
+     */
+    @Override
+    public final Optional<T> find(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.find(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#yield(java.util.function.Function)
+     */
+    @Override
+    public final AdaptationResult<T> yield(Function<? super Symbol<T>, ?> source) {
+        return Symbol.super.yield(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#put(java.util.function.BiConsumer,
+     *      java.lang.Object)
+     */
+    @Override
+    public final void put(BiConsumer<? super Symbol<T>, ? super T> consumer, Object value) {
+        Symbol.super.put(consumer, value);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#have(java.util.function.BiConsumer,
+     *      java.lang.Object)
+     */
+    @Override
+    public final Optional<T> have(BiConsumer<? super Symbol<T>, ? super T> consumer, Object value) {
+        return Symbol.super.have(consumer, value);
+    }
+
+    // Map-based access methods
+
+    /**
+     * @see net.yetamine.sova.Mappable#pull(java.util.Map)
+     */
+    @Override
+    public final <R> R pull(Map<?, ? extends R> source) {
+        return Symbol.super.pull(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#push(java.util.Map, java.lang.Object)
+     */
+    @Override
+    public final Object push(Map<? super Symbol<T>, ? super T> consumer, T value) {
+        return Symbol.super.push(consumer, value);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#get(java.util.Map)
+     */
+    @Override
+    public final T get(Map<?, ?> source) {
+        return Symbol.super.get(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#give(java.util.Map)
+     */
+    @Override
+    public final T give(Map<?, ?> source) {
+        return Symbol.super.give(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#find(java.util.Map)
+     */
+    @Override
+    public final Optional<T> find(Map<?, ?> source) {
+        return Symbol.super.find(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#yield(java.util.Map)
+     */
+    @Override
+    public final AdaptationResult<T> yield(Map<?, ?> source) {
+        return Symbol.super.yield(source);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#put(java.util.Map, java.lang.Object)
+     */
+    @Override
+    public final T put(Map<? super Symbol<T>, ? super T> consumer, Object value) {
+        return Symbol.super.put(consumer, value);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#let(java.util.Map, java.lang.Object)
+     */
+    @Override
+    public final T let(Map<? super Symbol<T>, ? super T> consumer, Object value) {
+        return Symbol.super.let(consumer, value);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#have(java.util.Map, java.lang.Object)
+     */
+    @Override
+    public final Optional<T> have(Map<? super Symbol<T>, ? super T> consumer, Object value) {
+        return Symbol.super.have(consumer, value);
+    }
+
+    /**
+     * @see net.yetamine.sova.Mappable#supply(java.util.Map,
+     *      java.util.function.Supplier)
+     */
+    @Override
+    public final T supply(Map<? super Symbol<T>, ? super T> map, Supplier<?> surrogate) {
+        return Symbol.super.supply(map, surrogate);
     }
 }

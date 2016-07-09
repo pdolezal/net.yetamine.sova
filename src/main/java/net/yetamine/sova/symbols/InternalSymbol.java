@@ -79,7 +79,7 @@ public class InternalSymbol<T> extends DelegatingSymbol<T> {
     }
 
     /**
-     * @see net.yetamine.sova.symbols.AbstractSymbol#introspect(java.util.Map)
+     * @see net.yetamine.sova.symbols.ExpansiveSymbol#introspect(java.util.Map)
      */
     @Override
     protected void introspect(Map<Object, Object> result) {

@@ -103,7 +103,7 @@ public final class NamedSymbol<T> extends InternalSymbol<T> implements Annotated
     }
 
     /**
-     * @see net.yetamine.sova.symbols.AbstractSymbol#introspect(java.util.Map)
+     * @see net.yetamine.sova.symbols.ExpansiveSymbol#introspect(java.util.Map)
      */
     @Override
     protected void introspect(Map<Object, Object> result) {

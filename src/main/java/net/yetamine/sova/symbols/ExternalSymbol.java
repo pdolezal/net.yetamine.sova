@@ -125,7 +125,7 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
     }
 
     /**
-     * @see net.yetamine.sova.symbols.AbstractSymbol#introspect(java.util.Map)
+     * @see net.yetamine.sova.symbols.ExpansiveSymbol#introspect(java.util.Map)
      */
     @Override
     protected void introspect(Map<Object, Object> result) {
