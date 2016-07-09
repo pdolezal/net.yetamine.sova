@@ -130,6 +130,6 @@ public class ExternalSymbol<I, V> extends DelegatingSymbol<V> implements PublicS
     @Override
     protected void introspect(Map<Object, Object> result) {
         super.introspect(result);
-        result.put(toString("uid"), identifier);
+        result.put("uid", identifier);
     }
 }

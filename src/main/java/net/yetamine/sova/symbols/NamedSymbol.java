@@ -108,6 +108,6 @@ public final class NamedSymbol<T> extends InternalSymbol<T> implements Annotated
     @Override
     protected void introspect(Map<Object, Object> result) {
         super.introspect(result);
-        result.put(toString("annotation"), annotation);
+        result.put("annotation", annotation);
     }
 }

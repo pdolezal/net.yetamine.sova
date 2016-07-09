@@ -84,7 +84,7 @@ public class InternalSymbol<T> extends DelegatingSymbol<T> {
     @Override
     protected void introspect(Map<Object, Object> result) {
         super.introspect(result);
-        result.put(toString("id"), String.format("hash:%08x", System.identityHashCode(this)));
-        result.put(toString("class"), getClass().getTypeName());
+        result.put("id", String.format("hash:%08x", System.identityHashCode(this)));
+        result.put("class", getClass().getTypeName());
     }
 }
