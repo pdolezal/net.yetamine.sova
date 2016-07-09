@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <!-- Redundant null check: does not count with the method override that may return null -->
+        <Class name="net.yetamine.sova.symbols.ExpansiveSymbol" />
+        <Method name="toString" />
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
+    </Match>
+</FindBugsFilter>
